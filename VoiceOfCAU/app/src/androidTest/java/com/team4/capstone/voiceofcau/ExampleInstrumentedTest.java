@@ -1,4 +1,4 @@
-package com.team4.caucapstone.voiceofcau;
+package com.team4.capstone.voiceofcau;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.team4.caucapstone.voiceofcau", appContext.getPackageName());
+        assertEquals("com.team4.capstone.voiceofcau", appContext.getPackageName());
     }
 }

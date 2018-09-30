@@ -4,23 +4,43 @@
   "CredentialsProvider": {
     "CognitoIdentity": {
       "Default": {
-        "PoolId": "us-east-1:5b3c4b3b-f64c-4a0a-9fd6-403b1b3fec5c",
-        "Region": "us-east-1"
+        "PoolId": "ap-northeast-2:34e14e73-880a-460e-8ad2-847aa7823923",
+        "Region": "ap-northeast-2"
       }
     }
   },
   "IdentityManager": {
     "Default": {}
   },
+  "CognitoUserPool": {
+    "Default": {
+      "PoolId": "ap-northeast-2_DpFGgu3BS",
+      "AppClientId": "1h5bjv7egggsrs37a5jbv8tmsb",
+      "AppClientSecret": "1r10en43n057m61asr7n6b8kodrunfn17g97p5j1u5iscc4qgtvm",
+      "Region": "ap-northeast-2"
+    }
+  },
+  "S3TransferUtility": {
+    "Default": {
+      "Bucket": "voiceofcau-userfiles-mobilehub-17894429",
+      "Region": "ap-northeast-2"
+    }
+  },
   "PinpointAnalytics": {
     "Default": {
-      "AppId": "ae52db15a62946ee95d02b7868532f62",
+      "AppId": "b506cdd2808d457c8a7144588222fe3e",
       "Region": "us-east-1"
     }
   },
   "PinpointTargeting": {
     "Default": {
       "Region": "us-east-1"
+    }
+  },
+  "UserFileManager": {
+    "Default": {
+      "Bucket": "voiceofcau-userfiles-mobilehub-17894429",
+      "Region": "ap-northeast-2"
     }
   }
 }

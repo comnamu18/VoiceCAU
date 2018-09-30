@@ -1,4 +1,4 @@
-package com.team4.caucapstone.voiceofcau;
+package com.team4.capstone.voiceofcau;
 
 import org.junit.Test;
 
