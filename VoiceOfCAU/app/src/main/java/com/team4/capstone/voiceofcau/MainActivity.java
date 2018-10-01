@@ -1,8 +1,10 @@
 package com.team4.capstone.voiceofcau;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,27 +14,114 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.AWSStartupHandler;
+import com.amazonaws.mobile.client.AWSStartupResult;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    ListView listView;
+    IconTextListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
+            @Override
+            public void onComplete(AWSStartupResult awsStartupResult) {
+                Log.d("YourMainActivity", "AWSMobileClient is instantiated and you are connected to AWS!");
+            }
+        }).execute();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) findViewById(R.id.songList);
+        adapter = new IconTextListAdapter(this);
+
+        String[] song1 = new String[2];
+        song1[0] = "My Way";
+        song1[1] = "이수";
+
+        String[] song2 = new String[2];
+        song2[0] = "가을 안부";
+        song2[1] = "먼데이키즈";
+
+        String[] song3 = new String[2];
+        song3[0] = "그날처럼";
+        song3[1] = "장덕철";
+
+        String[] song4 = new String[2];
+        song4[0] = "그떄 헤어지면 돼";
+        song4[1] = "로이킴";
+
+        String[] song5 = new String[2];
+        song5[0] = "넋두리";
+        song5[1] = "닐로";
+
+        String[] song6 = new String[2];
+        song6[0] = "모든 날, 모든 순간";
+        song6[1] = "폴킴";
+
+        String[] song7 = new String[2];
+        song7[0] = "열애중";
+        song7[1] = "벤";
+
+        String[] song8 = new String[2];
+        song8[0] = "좋니";
+        song8[1] = "윤종신";
+
+        String[] song9 = new String[2];
+        song9[0] = "지나오다";
+        song9[1] = "닐로";
+
+        String[] song10 = new String[2];
+        song10[0] = "첫눈처럼 너에게 가겠다";
+        song10[1] = "에일리";
+        Resources res = getResources();
+
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song1));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song2));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song3));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song4));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song5));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song6));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song7));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song8));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song9));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song10));
+
+        //리스트 뷰에 어댑터를 셋팅 함
+        listView.setAdapter(adapter);
+        //리스트 뷰를 클릭하면 해당 위치값을 받아와서 그 위치값의 Data를 읽어와서 curData에 저장한 후 Toast로 보여줌
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                IconTextItem curItem = (IconTextItem) adapter.getItem(position);
+                //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
+                String[] curData=curItem.getData();
+                //String temp = curItem.getData(0); 이렇게 써도 무관함 똑같은 의미를 지님
+                Toast.makeText(getApplicationContext(), "Selected : " + curData[0], Toast.LENGTH_LONG).show();
             }
         });
+
+
+
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -50,7 +139,6 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            IdentityManager.getDefaultIdentityManager().signOut();
             super.onBackPressed();
         }
     }
@@ -70,7 +158,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_record) {
+            return true;
+        }
+
+        else if (id == R.id.action_sync) {
             return true;
         }
 
@@ -90,12 +182,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

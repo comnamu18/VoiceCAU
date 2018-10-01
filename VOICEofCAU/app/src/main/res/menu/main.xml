@@ -6,4 +6,20 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_record"
+        android:icon="@android:drawable/ic_lock_idle_alarm"
+        android:title="record"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/action_sync"
+        android:icon="@android:drawable/ic_btn_speak_now"
+        android:title="sync"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
 </menu>
