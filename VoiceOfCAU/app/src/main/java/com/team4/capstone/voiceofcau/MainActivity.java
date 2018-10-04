@@ -1,5 +1,6 @@
 package com.team4.capstone.voiceofcau;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -107,7 +108,10 @@ public class MainActivity extends AppCompatActivity
                 //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
                 String[] curData=curItem.getData();
                 //String temp = curItem.getData(0); 이렇게 써도 무관함 똑같은 의미를 지님
-                Toast.makeText(getApplicationContext(), "Selected : " + curData[0], Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "Selected : " + curData[0], Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(getApplicationContext(), song_screen.class);
+                startActivity(intent);
             }
         });
 
