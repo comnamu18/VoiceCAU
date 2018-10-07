@@ -1,7 +1,12 @@
 package com.team4.capstone.voiceofcau;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,6 +33,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     ListView listView;
     IconTextListAdapter adapter;
+    private int mAudioSource = MediaRecorder.AudioSource.MIC;
+    private int mSampleRate = 44100;
+    private int mChannelCount = AudioFormat.CHANNEL_IN_STEREO;
+    private int mAudioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    private int mBufferSize = AudioTrack.getMinBufferSize(mSampleRate, mChannelCount, mAudioFormat);
+
+    public AudioRecord mAudioRecord = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,25 +119,10 @@ public class MainActivity extends AppCompatActivity
                 IconTextItem curItem = (IconTextItem) adapter.getItem(position);
                 //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
                 String[] curData=curItem.getData();
-                //String temp = curItem.getData(0); 이렇게 써도 무관함 똑같은 의미를 지님
-//                Toast.makeText(getApplicationContext(), "Selected : " + curData[0], Toast.LENGTH_LONG).show();
-
                 Intent intent = new Intent(getApplicationContext(), song_screen.class);
                 startActivity(intent);
             }
         });
-
-
-
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -163,7 +160,12 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_record) {
-            return true;
+            if(getPackageManager().hasSystemFeature(PackageManager.F)) {
+                Toast.makeText(getApplicationContext(), "Mic On", Toast.LENGTH_LONG).show();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Mic Off", Toast.LENGTH_LONG).show();
+            }
         }
 
         else if (id == R.id.action_sync) {
@@ -186,12 +188,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
+
         }
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
