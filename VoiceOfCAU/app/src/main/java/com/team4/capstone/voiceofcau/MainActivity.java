@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
                 IconTextItem curItem = (IconTextItem) adapter.getItem(position);
                 //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
                 String[] curData=curItem.getData();
-                Intent intent = new Intent(getApplicationContext(), song_screen.class);
+                Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
                 startActivity(intent);
             }
         });
