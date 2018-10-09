@@ -1,6 +1,7 @@
 package com.team4.capstone.voiceofcau;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioFormat;
@@ -8,6 +9,8 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -33,13 +36,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     ListView listView;
     IconTextListAdapter adapter;
-    private int mAudioSource = MediaRecorder.AudioSource.MIC;
-    private int mSampleRate = 44100;
-    private int mChannelCount = AudioFormat.CHANNEL_IN_STEREO;
-    private int mAudioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    private int mBufferSize = AudioTrack.getMinBufferSize(mSampleRate, mChannelCount, mAudioFormat);
-
-    public AudioRecord mAudioRecord = null;
+    MediaRecorder mRecorder;
+    boolean isRecording = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +130,22 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mRecorder = new MediaRecorder();
+    }
+    void initAudioRecorder() {
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record.3gp";
+        Log.d("TAG", "file path is" + mPath);
+        mRecorder.setOutputFile(mPath);
+        try{
+            mRecorder.prepare();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -140,7 +154,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            IdentityManager.getDefaultIdentityManager().signOut();
+
         }
     }
 
@@ -160,12 +175,16 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_record) {
-            if(getPackageManager().hasSystemFeature(PackageManager.F)) {
-                Toast.makeText(getApplicationContext(), "Mic On", Toast.LENGTH_LONG).show();
+            if (isRecording) {
+                mRecorder.stop();
+                Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
             }
             else {
-                Toast.makeText(getApplicationContext(), "Mic Off", Toast.LENGTH_LONG).show();
+                initAudioRecorder();
+                mRecorder.start();
+                Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
             }
+            isRecording = !isRecording;
         }
 
         else if (id == R.id.action_sync) {
