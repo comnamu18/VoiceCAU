@@ -1,19 +1,9 @@
 package com.team4.capstone.voiceofcau;
 
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,26 +18,28 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
-import com.amazonaws.mobile.client.AWSMobileClient;
-import com.amazonaws.mobile.client.AWSStartupHandler;
-import com.amazonaws.mobile.client.AWSStartupResult;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     ListView listView;
     IconTextListAdapter adapter;
-    MediaRecorder mRecorder;
-    boolean isRecording = false;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AWSMobileClient.getInstance().initialize(this, new AWSStartupHandler() {
-            @Override
-            public void onComplete(AWSStartupResult awsStartupResult) {
-                Log.d("YourMainActivity", "AWSMobileClient is instantiated and you are connected to AWS!");
-            }
-        }).execute();
+
+        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
+        SharedPreferences.Editor ed = prefs.edit();
+        ed.putBoolean("isRecord", false);
+        ed.putBoolean("isScoring", false);
+        ed.commit();
+        //ToDO : Keep changes and setting icon
+        /*
+        if(!prefs.contains("isRecord")){
+        }
+        if(!prefs.contains("isScoring")){
+        }*/
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -135,21 +127,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mRecorder = new MediaRecorder();
-    }
-    void initAudioRecorder() {
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record.3gp";
-        Log.d("TAG", "file path is" + mPath);
-        mRecorder.setOutputFile(mPath);
-        try{
-            mRecorder.prepare();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -159,7 +137,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             IdentityManager.getDefaultIdentityManager().signOut();
-
         }
     }
 
@@ -179,16 +156,18 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_record) {
-            if (isRecording) {
-                mRecorder.stop();
-                Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
-            }
-            else {
-                initAudioRecorder();
-                mRecorder.start();
+            boolean isRecord = !prefs.getBoolean("isRecord", true);
+            SharedPreferences.Editor ed = prefs.edit();
+            ed.putBoolean("isRecord", isRecord);
+            ed.commit();
+            if (isRecord) {
+                item.setIcon(R.drawable.mic_on);
                 Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
             }
-            isRecording = !isRecording;
+            else {
+                item.setIcon(R.drawable.mic_off);
+                Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
+            }
         }
 
         else if (id == R.id.action_sync) {

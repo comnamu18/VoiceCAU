@@ -7,31 +7,6 @@
     android:background="#000000"
     tools:context=".SongscreenActivity">
 
-    <!--<android.support.v7.widget.Toolbar-->
-        <!--android:id="@+id/toolbar1_3"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_marginBottom="450dp"-->
-        <!--android:layout_marginTop="2dp"-->
-        <!--android:background="?attr/colorPrimary"-->
-        <!--android:minHeight="?attr/actionBarSize"-->
-        <!--android:theme="?attr/actionBarTheme"-->
-        <!--app:layout_constraintBottom_toTopOf="@+id/button2"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/toolbar_title"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:text=""-->
-            <!--android:textColor="#ffffff"-->
-
-            <!--android:textSize="20sp" />-->
-    <!--</android.support.v7.widget.Toolbar>-->
-
     <Button
         android:id="@+id/button2"
         android:layout_width="41dp"
@@ -39,10 +14,9 @@
         android:layout_marginBottom="29dp"
         android:layout_marginStart="32dp"
 
-        android:background="@drawable/mybutton"
+        android:background="@drawable/recordoffbutton"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar1_3" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <VideoView
         android:id="@+id/videoView"

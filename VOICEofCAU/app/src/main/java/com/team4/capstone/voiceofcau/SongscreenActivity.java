@@ -1,20 +1,35 @@
 package com.team4.capstone.voiceofcau;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
-
 public class SongscreenActivity extends AppCompatActivity {
+    MediaRecorder mRecorder;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_screen);
 
+        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
+        mRecorder = new MediaRecorder();
+        if (prefs.getBoolean("isRecord", true)){
+            Button recordButton = (Button) findViewById(R.id.button2);
+            recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
+            initAudioRecorder();
+            mRecorder.start();
+        }
 
         Intent intent = getIntent();
         String Song = intent.getStringExtra("Songname");
@@ -32,21 +47,21 @@ public class SongscreenActivity extends AppCompatActivity {
                 (VideoView) findViewById(R.id.videoView);
         MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
-       Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
-       videoView.setVideoURI(video);
+        Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
+        videoView.setVideoURI(video);
         videoView.requestFocus();
         mediaController.setPadding(0, 0, 0, 80); //상위 레이어의 바닥에서 얼마 만큼? 패딩을 줌
         //videoView.setMediaController(mediaController);
 
         videoView.start();
 
-
-
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
+                mRecorder.stop();
+                mRecorder.release();
                 startActivity(intent);
             }
         });
@@ -63,13 +78,25 @@ public class SongscreenActivity extends AppCompatActivity {
 //        });
     }
 
+    void initAudioRecorder() {
+        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record.3gp";
+        Log.d("TAG", "file path is" + mPath);
+        mRecorder.setOutputFile(mPath);
+        try{
+            mRecorder.prepare();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
-
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
-
 
         super.onBackPressed();
 
