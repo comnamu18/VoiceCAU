@@ -59,7 +59,7 @@
                     android:id="@+id/dataItem03"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:textColor="#ffaf40"
+                    android:textColor="#ffffff"
                     android:textSize="14dp"/>
             </LinearLayout>
 

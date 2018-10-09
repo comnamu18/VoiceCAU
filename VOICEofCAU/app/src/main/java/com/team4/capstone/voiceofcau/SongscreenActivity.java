@@ -16,9 +16,12 @@ public class SongscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_song_screen);
 
 
+        Intent intent = getIntent();
+        String Song = intent.getStringExtra("Songname");
+        String SongName = Song.split("_")[0];
+        String SongPath = Song.split("_")[1];
 
-
-
+//        getSupportActionBar().setTitle("타이틀");
 //        MediaPlayer music = MediaPlayer.create(this,R.raw.my_way);
 //        music.start();
 //        music.setLooping(false);
@@ -29,7 +32,7 @@ public class SongscreenActivity extends AppCompatActivity {
                 (VideoView) findViewById(R.id.videoView);
         MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
-       Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/myway");
+       Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
        videoView.setVideoURI(video);
         videoView.requestFocus();
         mediaController.setPadding(0, 0, 0, 80); //상위 레이어의 바닥에서 얼마 만큼? 패딩을 줌

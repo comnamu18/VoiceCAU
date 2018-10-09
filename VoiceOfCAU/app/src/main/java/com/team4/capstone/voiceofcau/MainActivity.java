@@ -56,13 +56,15 @@ public class MainActivity extends AppCompatActivity
         listView = (ListView) findViewById(R.id.songList);
         adapter = new IconTextListAdapter(this);
 
-        String[] song1 = new String[2];
+        String[] song1 = new String[3];
         song1[0] = "My Way";
         song1[1] = "이수";
+        song1[2] = "myway";
 
-        String[] song2 = new String[2];
+        String[] song2 = new String[3];
         song2[0] = "가을 안부";
         song2[1] = "먼데이키즈";
+        song2[2] = "samplevideo";
 
         String[] song3 = new String[2];
         song3[0] = "그날처럼";
@@ -118,6 +120,8 @@ public class MainActivity extends AppCompatActivity
                 //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
                 String[] curData=curItem.getData();
                 Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                String songData = curData[0] + "_" + curData[2];
+                intent.putExtra("Songname",songData);
                 startActivity(intent);
             }
         });
