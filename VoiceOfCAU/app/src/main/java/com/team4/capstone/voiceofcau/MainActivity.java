@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.client.AWSMobileClient;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -127,7 +128,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
     }
 
     @Override
@@ -171,6 +171,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         else if (id == R.id.action_sync) {
+            boolean isRecord = prefs.getBoolean("isRecord", true);
+            if (isRecord){
+                boolean isScoring = !prefs.getBoolean("isScoring", true);
+                SharedPreferences.Editor ed = prefs.edit();
+                ed.putBoolean("isScoring", isRecord);
+                ed.commit();
+                if(isScoring){
+                    Toast.makeText(getApplicationContext(),"ScoreMode On", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"ScoreMode Off", Toast.LENGTH_LONG).show();
+                }
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"ScoreMode need Record On", Toast.LENGTH_LONG).show();
+            }
             return true;
         }
 
