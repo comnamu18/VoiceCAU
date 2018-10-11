@@ -16,6 +16,7 @@ import android.widget.VideoView;
 public class SongscreenActivity extends AppCompatActivity {
     MediaRecorder mRecorder;
     SharedPreferences prefs;
+    String SongName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,15 +34,13 @@ public class SongscreenActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String Song = intent.getStringExtra("Songname");
-        String SongName = Song.split("_")[0];
+        SongName = Song.split("_")[0];
         String SongPath = Song.split("_")[1];
 
 //        getSupportActionBar().setTitle("타이틀");
 //        MediaPlayer music = MediaPlayer.create(this,R.raw.my_way);
 //        music.start();
 //        music.setLooping(false);
-
-
 
         final VideoView videoView =
                 (VideoView) findViewById(R.id.videoView);
@@ -83,8 +82,7 @@ public class SongscreenActivity extends AppCompatActivity {
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record.3gp";
-        Log.d("TAG", "file path is" + mPath);
+        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + SongName + ".3gp";
         mRecorder.setOutputFile(mPath);
         try{
             mRecorder.prepare();
