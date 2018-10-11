@@ -57,39 +57,48 @@ public class MainActivity extends AppCompatActivity
         String[] song2 = new String[3];
         song2[0] = "가을 안부";
         song2[1] = "먼데이키즈";
-        song2[2] = "samplevideo";
+        song2[2] = "kauel";
 
         String[] song3 = new String[2];
         song3[0] = "그날처럼";
         song3[1] = "장덕철";
+        song3[2] = "thatday";
 
         String[] song4 = new String[2];
         song4[0] = "그떄 헤어지면 돼";
         song4[1] = "로이킴";
+        song4[2] = "thattime";
 
         String[] song5 = new String[2];
         song5[0] = "넋두리";
         song5[1] = "닐로";
+        song5[2] = "neokduri";
 
         String[] song6 = new String[2];
         song6[0] = "모든 날, 모든 순간";
         song6[1] = "폴킴";
+        song6[2] = "everytime";
 
         String[] song7 = new String[2];
         song7[0] = "열애중";
         song7[1] = "벤";
+        song7[2] = "dating";
 
         String[] song8 = new String[2];
         song8[0] = "좋니";
         song8[1] = "윤종신";
+        song8[2] = "good";
 
         String[] song9 = new String[2];
         song9[0] = "지나오다";
         song9[1] = "닐로";
+        song9[2] = "passby";
 
         String[] song10 = new String[2];
         song10[0] = "첫눈처럼 너에게 가겠다";
         song10[1] = "에일리";
+        song10[2] = "snow";
+
         Resources res = getResources();
 
         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song1));
