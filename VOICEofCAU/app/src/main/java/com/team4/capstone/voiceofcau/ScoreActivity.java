@@ -41,14 +41,9 @@ public class ScoreActivity extends AppCompatActivity {
     @Override
 
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-
-
-        super.onBackPressed();
-
+        Intent intent = new Intent(this, PopupActivity.class);
+        intent.putExtra("data", "Test Popup");
+        startActivityForResult(intent, 1);
     }
-
-
 
 }

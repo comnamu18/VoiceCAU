@@ -17,6 +17,10 @@ public class SongscreenActivity extends AppCompatActivity {
     MediaRecorder mRecorder;
     SharedPreferences prefs;
     String SongName;
+    MediaController mediaController;
+    VideoView videoView;
+    public static final int RESULT_CONT = 44;
+    public static final int RESULT_BEGIN = 43;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +46,9 @@ public class SongscreenActivity extends AppCompatActivity {
 //        music.start();
 //        music.setLooping(false);
 
-        final VideoView videoView =
+        videoView =
                 (VideoView) findViewById(R.id.videoView);
-        MediaController mediaController = new MediaController(this);
+        mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
         Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
         videoView.setVideoURI(video);
@@ -93,11 +97,30 @@ public class SongscreenActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
+            videoView.pause();
 
-        super.onBackPressed();
+            //데이터 담아서 팝업(액티비티) 호출
+            Intent intent = new Intent(this, PopupActivity.class);
+            startActivityForResult(intent,1);
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==1){
+            if(resultCode==RESULT_CONT){
+                //데이터 받기
+
+                videoView.start();
+            }
+
+            else if(resultCode==RESULT_BEGIN){
+                //데이터 받기
+                videoView.seekTo(0);
+                videoView.start();
+            }
+        }
+    }
+
 
 }

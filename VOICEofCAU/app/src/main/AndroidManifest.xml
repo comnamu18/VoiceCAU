@@ -25,10 +25,11 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".SongscreenActivity"/>
+        <activity android:name=".SongscreenActivity" />
         <activity android:name=".ScoreActivity" />
-        <activity android:name=".Detail_scoreActivity" >
-        </activity>
+        <activity android:name=".Detail_scoreActivity"></activity>
+        <activity android:name=".PopupActivity"
+            android:theme="@android:style/Theme.Dialog"></activity>
     </application>
 
 </manifest>
