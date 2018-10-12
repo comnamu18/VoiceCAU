@@ -1,5 +1,6 @@
 package com.team4.capstone.voiceofcau;
 
+import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -7,11 +8,17 @@ import android.net.Uri;
 import android.net.rtp.AudioStream;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.opencsv.CSVReader;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
@@ -19,7 +26,7 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.ArrayList;
 import java.lang.*;
-
+import java.util.StringTokenizer;
 
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -35,10 +42,15 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 
-public class ScoreController extends AppCompatActivity{
+public class AudioController{
+    boolean isScoring = false;
+    String SongName;
+    String filePath;
 
-    public static void main(String[] args){
-
+    public AudioController(String filePath, String SongName, boolean isRecord, boolean isScoring){
+        this.SongName = SongName;
+        this.isScoring = isScoring;
+        this.filePath = filePath;
      /*   AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
 
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
@@ -59,29 +71,66 @@ public class ScoreController extends AppCompatActivity{
         dispatcher.addAudioProcessor(p);
         new Thread(dispatcher,"Audio Dispatcher").start();*/
 
-            int sampleRate = 44100;
-            int audioBufferSize = 2048;
-            int bufferOverlap = 0;
+        int sampleRate = 44100;
+        int audioBufferSize = 2048;
+        int bufferOverlap = 0;
 
-            //Create an AudioInputStream from my .wav file
+        //Create an AudioInputStream from my .wav file
 
-            AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 2048);
+        AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 2048);
 
-            //Convert into TarsosDSP API
-            TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(sampleRate, 16, 1, true, false);
-            TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
+        //Convert into TarsosDSP API
+        TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(sampleRate, 16, 1, true, false);
+        TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
 
-            AudioDispatcher dispatcher = new AudioDispatcher(audioStream, 2048, 0);
-            MyPitchDetector myPitchDetector = new MyPitchDetector();
+        AudioDispatcher dispatcher = new AudioDispatcher(audioStream, 2048, 0);
+        MyPitchDetector myPitchDetector = new MyPitchDetector();
 
-            dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.YIN, 44100, 2048, myPitchDetector));
-            dispatcher.run();
+        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.YIN, 44100, 2048, myPitchDetector));
+        dispatcher.run();
+    }
 
+    public double getScore() {
+        double ret = -1;
+        if (!isScoring)
+            return ret;
 
+        //String scorePath = this.filePath + "/scoring/";
+        //File file = new File(scorePath, "mywayscore.txt");
+
+        BufferedReader bufrd = null;
+        String[] str;
+        ArrayList<Double> singerStartTime = new ArrayList<>();
+        ArrayList<Double> singerEndTime = new ArrayList<>();
+        ArrayList<Integer> singerSubInterval1 = new ArrayList<>();
+        ArrayList<Integer> singerSubInterval2 = new ArrayList<>();
+        StringTokenizer myTokens;
+
+        int trytoken = 0;
+        try {
+            CSVReader reader = new CSVReader(new FileReader("mywayscore.csv"));
+            while ((str = reader.readNext()) != null) {
+                myTokens = new StringTokenizer(str[trytoken], ",");
+                singerStartTime.add(Double.parseDouble(myTokens.nextToken()));
+                singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
+                singerSubInterval1.add(Integer.parseInt(myTokens.nextToken()));
+                singerSubInterval2.add(Integer.parseInt(myTokens.nextToken()));
+                trytoken++;
+                Log.d("chk", String.valueOf(singerSubInterval1.get(0)));
+            }
+            reader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
+
+        return ret;
     }
+
+}
 
 
 
@@ -230,7 +279,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
                     CalculateScore.endTime.add(timeStamp);
                     CalculateScore.subInterval1.add(intvNum);
                     CalculateScore.subInterval2.add(intvNum);
-                    CalculateScore.realInterval.add(null);
+                    //CalculateScore.realInterval.add(null);
                     tried++;
                 }
                 else if(((CalculateScore.subInterval1.get(idx)) - intvNum) == 0 || Math.abs(((CalculateScore.subInterval1.get(idx)) - intvNum)) == 1) {
@@ -244,7 +293,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
                     CalculateScore.endTime.add(timeStamp);
                     CalculateScore.subInterval1.add(intvNum);
                     CalculateScore.subInterval2.add(intvNum);
-                    CalculateScore.realInterval.add(null);
+                    //CalculateScore.realInterval.add(null);
                     idx++;
                 }
 
@@ -259,7 +308,7 @@ class CalculateScore {
     public static ArrayList<Double> endTime = new ArrayList<>();
     public static ArrayList<Integer> subInterval1 = new ArrayList<>();
     public static ArrayList<Integer> subInterval2 = new ArrayList<>();
-    public static ArrayList<Integer> realInterval = new ArrayList<>();
+    //public static ArrayList<Integer> realInterval = new ArrayList<>();
 }
 
 
