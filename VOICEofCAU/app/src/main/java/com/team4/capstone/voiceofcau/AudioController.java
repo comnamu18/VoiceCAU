@@ -80,24 +80,25 @@ public class AudioController{
         dispatcher.addAudioProcessor(p);
         new Thread(dispatcher,"Audio Dispatcher").start();*/
 
-        int sampleRate = 44100;
+        int sampleRate = 22050;
         int audioBufferSize = 2048;
         int bufferOverlap = 0;
 
         //Create an AudioInputStream from my .wav file
 
-        /*AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 2048);
+        AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 4096);
         Log.d("TEST2", "Stream CReated");
         //Convert into TarsosDSP API
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(sampleRate, 16, 1, true, false);
         TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
         Log.d("TEST3", "TarsosDSP CReated");
-        AudioDispatcher dispatcher = new AudioDispatcher(audioStream, 2048, 0);*/
+        stream.startRecording();
+        dispatcher = new AudioDispatcher(audioStream, 2048, 0);
 
 
         MyPitchDetector myPitchDetector = new MyPitchDetector();
         Log.d("TEST4", "Dispatcher CReated");
-        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,2048,0);
+        //dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,2048,0);
 
         dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, audioBufferSize, myPitchDetector));
         Log.d("TEST10", "Stream CReated");

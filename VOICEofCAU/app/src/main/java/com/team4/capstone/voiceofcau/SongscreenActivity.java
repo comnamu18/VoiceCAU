@@ -89,11 +89,11 @@ public class SongscreenActivity extends AppCompatActivity {
 //
 //        });
     }
-    /*
+
     void initAudioRecorder() {
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        //mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        //mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        //mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + SongName + ".3gp";
         mRecorder.setOutputFile(mPath);
@@ -102,7 +102,7 @@ public class SongscreenActivity extends AppCompatActivity {
         } catch (Exception e){
             e.printStackTrace();
         }
-    }*/
+    }
 
     @Override
     public void onBackPressed() {
