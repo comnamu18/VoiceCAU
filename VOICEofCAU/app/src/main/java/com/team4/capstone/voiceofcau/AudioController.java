@@ -1,6 +1,8 @@
 package com.team4.capstone.voiceofcau;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -21,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
@@ -46,11 +49,17 @@ public class AudioController{
     boolean isScoring = false;
     String SongName;
     String filePath;
+    Context context;
+    Thread scoreThread;
+    AudioDispatcher dispatcher;
 
-    public AudioController(String filePath, String SongName, boolean isRecord, boolean isScoring){
+    public AudioController(Context context, String filePath, String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
         this.isScoring = isScoring;
         this.filePath = filePath;
+        this.context = context;
+        Log.d("TEST1", "Create1");
+
      /*   AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
 
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
@@ -77,46 +86,57 @@ public class AudioController{
 
         //Create an AudioInputStream from my .wav file
 
-        AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 2048);
-
+        /*AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 2048);
+        Log.d("TEST2", "Stream CReated");
         //Convert into TarsosDSP API
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(sampleRate, 16, 1, true, false);
         TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
+        Log.d("TEST3", "TarsosDSP CReated");
+        AudioDispatcher dispatcher = new AudioDispatcher(audioStream, 2048, 0);*/
 
-        AudioDispatcher dispatcher = new AudioDispatcher(audioStream, 2048, 0);
+
         MyPitchDetector myPitchDetector = new MyPitchDetector();
+        Log.d("TEST4", "Dispatcher CReated");
+        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,2048,0);
 
-        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.YIN, 44100, 2048, myPitchDetector));
-        dispatcher.run();
+        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, audioBufferSize, myPitchDetector));
+        Log.d("TEST10", "Stream CReated");
+        scoreThread = new Thread(dispatcher, "Dispatcher");
+
+        scoreThread.start();
+
     }
+
 
     public double getScore() {
         double ret = -1;
-        if (!isScoring)
-            return ret;
 
         //String scorePath = this.filePath + "/scoring/";
         //File file = new File(scorePath, "mywayscore.txt");
 
         BufferedReader bufrd = null;
         String[] str;
+        ArrayList<String> singtitle = new ArrayList<>();
         ArrayList<Double> singerStartTime = new ArrayList<>();
         ArrayList<Double> singerEndTime = new ArrayList<>();
         ArrayList<Integer> singerSubInterval1 = new ArrayList<>();
         ArrayList<Integer> singerSubInterval2 = new ArrayList<>();
+        ArrayList<String> singerTest = new ArrayList<>();
         StringTokenizer myTokens;
 
         int trytoken = 0;
         try {
-            CSVReader reader = new CSVReader(new FileReader("mywayscore.csv"));
-            while ((str = reader.readNext()) != null) {
-                myTokens = new StringTokenizer(str[trytoken], ",");
+            //final CSVReader reader = new CSVReader(new InputStreamReader(getAssets().open("mywayscore.csv")));
+            InputStreamReader is = new InputStreamReader(context.getAssets().open("mywayscore.csv"));
+            BufferedReader reader = new BufferedReader(is);
+            String str2;
+            while ((str2 = reader.readLine()) != null) {
+                myTokens = new StringTokenizer(str2, ",");
+                singtitle.add(myTokens.nextToken());
                 singerStartTime.add(Double.parseDouble(myTokens.nextToken()));
                 singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
                 singerSubInterval1.add(Integer.parseInt(myTokens.nextToken()));
                 singerSubInterval2.add(Integer.parseInt(myTokens.nextToken()));
-                trytoken++;
-                Log.d("chk", String.valueOf(singerSubInterval1.get(0)));
             }
             reader.close();
         } catch (FileNotFoundException e) {
@@ -124,9 +144,6 @@ public class AudioController{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
         return ret;
     }
 
@@ -143,7 +160,6 @@ class  MyPitchDetector implements PitchDetectionHandler{
         if(pitchDetectionResult.getPitch() != -1){
             double timeStamp = audioEvent.getTimeStamp();
             float pitch = pitchDetectionResult.getPitch();
-            pitch *= 2; // Because of bit of file
             float probability = pitchDetectionResult.getProbability();
             double rms = audioEvent.getRMS() * 100;
             int pMinute = (int) (timeStamp/60);
@@ -273,7 +289,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
             if(pitch < 8000 && probability > 0.85) {
                 String message = String.format("Pitch detected at %d 분 %d초, %.2f: %.2fHz ( %.2f probability, RMS: %.5f ) %s",
                         pMinute, pSecond, timeStamp, pitch,probability,rms,tInterval);
-                // System.out.println(message);
+                Log.d("test", message);
                 if(tried == 0) {
                     CalculateScore.startTime.add(timeStamp);
                     CalculateScore.endTime.add(timeStamp);

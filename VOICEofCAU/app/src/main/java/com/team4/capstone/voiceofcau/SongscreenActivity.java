@@ -1,5 +1,6 @@
 package com.team4.capstone.voiceofcau;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -19,6 +20,8 @@ public class SongscreenActivity extends AppCompatActivity {
     String SongName;
     MediaController mediaController;
     VideoView videoView;
+    boolean isRecord;
+    boolean isScoring;
     public static final int RESULT_CONT = 44;
     public static final int RESULT_BEGIN = 43;
 
@@ -28,12 +31,14 @@ public class SongscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_song_screen);
 
         prefs = getSharedPreferences("MODE", MODE_PRIVATE);
-        mRecorder = new MediaRecorder();
-        if (prefs.getBoolean("isRecord", true)){
+        isRecord= prefs.getBoolean("isRecord", true);
+        isScoring = prefs.getBoolean("isScoring", true);
+        //mRecorder = new MediaRecorder();
+        if (isRecord){
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
-            initAudioRecorder();
-            mRecorder.start();
+            //initAudioRecorder();
+            //mRecorder.start();
         }
 
         Intent intent = getIntent();
@@ -45,6 +50,8 @@ public class SongscreenActivity extends AppCompatActivity {
 //        MediaPlayer music = MediaPlayer.create(this,R.raw.my_way);
 //        music.start();
 //        music.setLooping(false);
+        final AudioController audioController = new AudioController(
+                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
 
         videoView =
                 (VideoView) findViewById(R.id.videoView);
@@ -63,9 +70,11 @@ public class SongscreenActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
-                mRecorder.stop();
-                mRecorder.release();
+                //mRecorder.stop();
+                //mRecorder.release();
                 startActivity(intent);
+                audioController.dispatcher.stop();
+                audioController.scoreThread.interrupt();
             }
         });
 
@@ -80,7 +89,7 @@ public class SongscreenActivity extends AppCompatActivity {
 //
 //        });
     }
-
+    /*
     void initAudioRecorder() {
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -93,7 +102,7 @@ public class SongscreenActivity extends AppCompatActivity {
         } catch (Exception e){
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public void onBackPressed() {

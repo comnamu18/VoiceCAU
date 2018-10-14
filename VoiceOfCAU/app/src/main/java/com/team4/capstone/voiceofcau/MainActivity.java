@@ -198,10 +198,11 @@ public class MainActivity extends AppCompatActivity
                 ed.putBoolean("isScoring", isRecord);
                 ed.commit();
                 if(isScoring){
-                    getScore();
+                    item.setIcon(R.drawable.pen_on);
                     Toast.makeText(getApplicationContext(),"ScoreMode On", Toast.LENGTH_LONG).show();
                 }
                 else{
+                    item.setIcon(R.drawable.pen_off);
                     Toast.makeText(getApplicationContext(),"ScoreMode Off", Toast.LENGTH_LONG).show();
                 }
             }
@@ -212,44 +213,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    public double getScore() {
-        double ret = -1;
-
-        //String scorePath = this.filePath + "/scoring/";
-        //File file = new File(scorePath, "mywayscore.txt");
-
-        BufferedReader bufrd = null;
-        String[] str;
-        ArrayList<Double> singerStartTime = new ArrayList<>();
-        ArrayList<Double> singerEndTime = new ArrayList<>();
-        ArrayList<Integer> singerSubInterval1 = new ArrayList<>();
-        ArrayList<Integer> singerSubInterval2 = new ArrayList<>();
-        ArrayList<String> singerTest = new ArrayList<>();
-        StringTokenizer myTokens;
-
-        int trytoken = 0;
-        try {
-            //final CSVReader reader = new CSVReader(new InputStreamReader(getAssets().open("mywayscore.csv")));
-            InputStreamReader is = new InputStreamReader(getAssets().open("mywayscore.csv"));
-            BufferedReader reader = new BufferedReader(is);
-            String str2;
-            while ((str2 = reader.readLine()) != null) {
-                myTokens = new StringTokenizer(str2, ",");
-                double a = Double.parseDouble(myTokens.nextToken());
-                Log.d("test", String.valueOf(a));
-                singerStartTime.add(a);
-                singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
-                singerSubInterval1.add(Integer.parseInt(myTokens.nextToken()));
-                singerSubInterval2.add(Integer.parseInt(myTokens.nextToken()));
-            }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ret;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
