@@ -52,7 +52,7 @@ public class AudioController{
     Context context;
     Thread scoreThread;
     AudioDispatcher dispatcher;
-
+    AudioProcessor audioProcessor;
     public AudioController(Context context, String filePath, String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
         this.isScoring = isScoring;
@@ -77,13 +77,18 @@ public class AudioController{
         MyPitchDetector myPitchDetector = new MyPitchDetector();
         Log.d("TEST4", "Dispatcher CReated");
         //dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,2048,0);
-
-        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, audioBufferSize, myPitchDetector));
+        audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, audioBufferSize, myPitchDetector);
+        dispatcher.addAudioProcessor(audioProcessor);
         Log.d("TEST10", "Stream CReated");
         scoreThread = new Thread(dispatcher, "Dispatcher");
 
         scoreThread.start();
 
+    }
+    public void stopAudioProcessor(AudioProcessor adp, AudioDispatcher adpc, Thread thd){
+        adpc.stop();
+        adpc.removeAudioProcessor(adp);
+        thd.interrupt();
     }
 
     public double getScore() {
