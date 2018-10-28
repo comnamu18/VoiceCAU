@@ -60,31 +60,9 @@ public class AudioController{
         this.context = context;
         Log.d("TEST1", "Create1");
 
-     /*   AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-
-        PitchDetectionHandler pdh = new PitchDetectionHandler() {
-            @Override
-            public void handlePitch(PitchDetectionResult result, AudioEvent e) {
-                final float pitchInHz = result.getPitch();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView text = (TextView) findViewById(R.id.textView);
-                        text.setText("" + pitchInHz);
-                    }
-                });
-            }
-        };
-
-        AudioProcessor p = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
-        dispatcher.addAudioProcessor(p);
-        new Thread(dispatcher,"Audio Dispatcher").start();*/
-
         int sampleRate = 22050;
         int audioBufferSize = 2048;
         int bufferOverlap = 0;
-
-        //Create an AudioInputStream from my .wav file
 
         AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 4096);
         Log.d("TEST2", "Stream CReated");
@@ -107,7 +85,6 @@ public class AudioController{
         scoreThread.start();
 
     }
-
 
     public double getScore() {
         double ret = -1;
@@ -149,8 +126,6 @@ public class AudioController{
     }
 
 }
-
-
 
 class  MyPitchDetector implements PitchDetectionHandler{
     static int tried = 0;

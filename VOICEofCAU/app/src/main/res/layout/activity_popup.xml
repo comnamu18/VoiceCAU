@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:id="@+id/txtText"
+            android:id="@+id/popupText"
             android:textSize="15sp"
             android:textColor="#000"
             android:alpha="0.87"
@@ -38,7 +38,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-    <!-- Notice -->
 
     <View
         android:background="#66bdbdbd"

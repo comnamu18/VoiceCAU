@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,17 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.amazonaws.mobile.auth.core.IdentityManager;
-import com.amazonaws.mobile.client.AWSMobileClient;
-import com.opencsv.CSVReader;
 
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -43,15 +32,33 @@ public class MainActivity extends AppCompatActivity
 
         prefs = getSharedPreferences("MODE", MODE_PRIVATE);
         SharedPreferences.Editor ed = prefs.edit();
-        ed.putBoolean("isRecord", false);
-        ed.putBoolean("isScoring", false);
-        ed.commit();
-        //ToDO : Keep changes and setting icon
-        /*
         if(!prefs.contains("isRecord")){
+            ed.putBoolean("isRecord", false);
+        }
+        else{
+            MenuItem item = findViewById(R.id.action_record);
+            boolean isRecord = !prefs.getBoolean("isRecord", true);
+            if (isRecord) {
+                item.setIcon(R.drawable.mic_on);
+            }
+            else {
+                item.setIcon(R.drawable.mic_off);
+            }
         }
         if(!prefs.contains("isScoring")){
-        }*/
+            ed.putBoolean("isScoring", false);
+        }
+        else{
+            MenuItem item = findViewById(R.id.action_sync);
+            boolean isScoring = !prefs.getBoolean("isScoring", true);
+            if (isScoring) {
+                item.setIcon(R.drawable.pen_on);
+            }
+            else {
+                item.setIcon(R.drawable.pen_off);
+            }
+        }
+        ed.commit();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

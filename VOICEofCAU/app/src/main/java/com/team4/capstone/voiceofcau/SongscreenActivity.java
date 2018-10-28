@@ -20,8 +20,10 @@ public class SongscreenActivity extends AppCompatActivity {
     String SongName;
     MediaController mediaController;
     VideoView videoView;
+    AudioController audioController;
     boolean isRecord;
     boolean isScoring;
+    public static final int RESULT_MAIN = 45;
     public static final int RESULT_CONT = 44;
     public static final int RESULT_BEGIN = 43;
 
@@ -33,25 +35,20 @@ public class SongscreenActivity extends AppCompatActivity {
         prefs = getSharedPreferences("MODE", MODE_PRIVATE);
         isRecord= prefs.getBoolean("isRecord", true);
         isScoring = prefs.getBoolean("isScoring", true);
-        //mRecorder = new MediaRecorder();
-        if (isRecord){
-            Button recordButton = (Button) findViewById(R.id.button2);
-            recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
-            //initAudioRecorder();
-            //mRecorder.start();
-        }
 
         Intent intent = getIntent();
         String Song = intent.getStringExtra("Songname");
         SongName = Song.split("_")[0];
         String SongPath = Song.split("_")[1];
 
-//        getSupportActionBar().setTitle("타이틀");
-//        MediaPlayer music = MediaPlayer.create(this,R.raw.my_way);
-//        music.start();
-//        music.setLooping(false);
-        final AudioController audioController = new AudioController(
-                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
+        if (isRecord){
+            Button recordButton = (Button) findViewById(R.id.button2);
+            recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
+        }
+        if(isRecord || isScoring){
+            final AudioController audioController = new AudioController(
+                    getApplicationContext(), SongPath, SongName, isRecord, isScoring);
+        }
 
         videoView =
                 (VideoView) findViewById(R.id.videoView);
@@ -60,9 +57,7 @@ public class SongscreenActivity extends AppCompatActivity {
         Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
         videoView.setVideoURI(video);
         videoView.requestFocus();
-        mediaController.setPadding(0, 0, 0, 80); //상위 레이어의 바닥에서 얼마 만큼? 패딩을 줌
-        //videoView.setMediaController(mediaController);
-
+        mediaController.setPadding(0, 0, 0, 80);
         videoView.start();
 
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -70,48 +65,21 @@ public class SongscreenActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
-                //mRecorder.stop();
-                //mRecorder.release();
                 startActivity(intent);
+                //audioController 내부에 멈추는거 구현 해야함
                 audioController.dispatcher.stop();
                 audioController.scoreThread.interrupt();
             }
         });
 
-
-//        music.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            @Override
-//            public void onCompletion(MediaPlayer mp)
-//            {
-//                mp.stop();
-//                mp.release();
-//            }
-//
-//        });
-    }
-
-    void initAudioRecorder() {
-        //mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        //mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        //mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + SongName + ".3gp";
-        mRecorder.setOutputFile(mPath);
-        try{
-            mRecorder.prepare();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void onBackPressed() {
             videoView.pause();
-
             //데이터 담아서 팝업(액티비티) 호출
             Intent intent = new Intent(this, PopupActivity.class);
             startActivityForResult(intent,1);
-
     }
 
     @Override
@@ -119,14 +87,18 @@ public class SongscreenActivity extends AppCompatActivity {
         if(requestCode==1){
             if(resultCode==RESULT_CONT){
                 //데이터 받기
-
                 videoView.start();
             }
-
             else if(resultCode==RESULT_BEGIN){
                 //데이터 받기
                 videoView.seekTo(0);
+                //AdudioController 소멸자 필요
+                //AudioController 재 생성 필요
                 videoView.start();
+            }
+            else if(resultCode==RESULT_MAIN){
+                //AdudioController 소멸자 필요
+                finish();
             }
         }
     }

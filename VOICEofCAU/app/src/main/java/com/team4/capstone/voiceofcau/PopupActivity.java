@@ -22,44 +22,32 @@ public class PopupActivity extends Activity {
         setContentView(R.layout.activity_popup);
 
         //UI 객체생성
-        txtText = (TextView)findViewById(R.id.txtText);
-
-        //데이터 가져오기
-        Intent intent = getIntent();
-        String data = intent.getStringExtra("data");
-        txtText.setText(data);
+        txtText = (TextView)findViewById(R.id.popupText);
+        txtText.setText(R.string.popup_notice);
 
     }
 
-
+    //돌아가기
     public void Return (View v){
         Intent intent = new Intent();
-
         setResult(SongscreenActivity.RESULT_BEGIN, intent);
-
         //액티비티(팝업) 닫기
         finish();
-
     }
 
     //확인 버튼 클릭
     public void Continue (View v){
         Intent intent = new Intent();
-
         setResult(SongscreenActivity.RESULT_CONT, intent);
-
         //액티비티(팝업) 닫기
         finish();
-
     }
 
-
-
+    //메인 메뉴로 돌아가기
     public void Main (View v){
         //데이터 전달하기
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-
+        Intent intent = new Intent();
+        setResult(SongscreenActivity.RESULT_MAIN, intent);
         //액티비티(팝업) 닫기
         finish();
     }
