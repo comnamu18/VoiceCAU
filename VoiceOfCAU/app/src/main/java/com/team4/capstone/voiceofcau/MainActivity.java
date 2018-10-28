@@ -30,36 +30,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
-        SharedPreferences.Editor ed = prefs.edit();
-        if(!prefs.contains("isRecord")){
-            ed.putBoolean("isRecord", false);
-        }
-        else{
-            MenuItem item = findViewById(R.id.action_record);
-            boolean isRecord = !prefs.getBoolean("isRecord", true);
-            if (isRecord) {
-                item.setIcon(R.drawable.mic_on);
-            }
-            else {
-                item.setIcon(R.drawable.mic_off);
-            }
-        }
-        if(!prefs.contains("isScoring")){
-            ed.putBoolean("isScoring", false);
-        }
-        else{
-            MenuItem item = findViewById(R.id.action_sync);
-            boolean isScoring = !prefs.getBoolean("isScoring", true);
-            if (isScoring) {
-                item.setIcon(R.drawable.pen_on);
-            }
-            else {
-                item.setIcon(R.drawable.pen_off);
-            }
-        }
-        ed.commit();
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -171,6 +141,35 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
+        SharedPreferences.Editor ed = prefs.edit();
+        if(!prefs.contains("isRecord")){
+            ed.putBoolean("isRecord", false);
+        }
+        else{
+            MenuItem item = menu.findItem(R.id.action_record);
+            boolean isRecord = prefs.getBoolean("isRecord", true);
+            if (isRecord) {
+                item.setIcon(R.drawable.mic_on);
+            }
+            else {
+                item.setIcon(R.drawable.mic_off);
+            }
+        }
+        if(!prefs.contains("isScoring")){
+            ed.putBoolean("isScoring", false);
+        }
+        else{
+            MenuItem item = menu.findItem(R.id.action_sync);
+            boolean isScoring = prefs.getBoolean("isScoring", true);
+            if (isScoring) {
+                item.setIcon(R.drawable.pen_on);
+            }
+            else {
+                item.setIcon(R.drawable.pen_off);
+            }
+        }
+        ed.commit();
         return true;
     }
 
@@ -196,27 +195,19 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
             }
         }
-
         else if (id == R.id.action_sync) {
-            boolean isRecord = prefs.getBoolean("isRecord", true);
-            if (isRecord){
-                boolean isScoring = !prefs.getBoolean("isScoring", true);
-                SharedPreferences.Editor ed = prefs.edit();
-                ed.putBoolean("isScoring", isRecord);
-                ed.commit();
-                if(isScoring){
-                    item.setIcon(R.drawable.pen_on);
-                    Toast.makeText(getApplicationContext(),"ScoreMode On", Toast.LENGTH_LONG).show();
-                }
-                else{
-                    item.setIcon(R.drawable.pen_off);
-                    Toast.makeText(getApplicationContext(),"ScoreMode Off", Toast.LENGTH_LONG).show();
-                }
+            boolean isRecord = !prefs.getBoolean("isScoring", true);
+            SharedPreferences.Editor ed = prefs.edit();
+            ed.putBoolean("isScoring", isRecord);
+            ed.commit();
+            if (isRecord) {
+                item.setIcon(R.drawable.pen_on);
+                Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
             }
-            else{
-                Toast.makeText(getApplicationContext(),"ScoreMode need Record On", Toast.LENGTH_LONG).show();
+            else {
+                item.setIcon(R.drawable.pen_off);
+                Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
             }
-            return true;
         }
 
         return super.onOptionsItemSelected(item);
