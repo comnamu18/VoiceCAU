@@ -85,15 +85,18 @@ public class AudioController{
         scoreThread.start();
 
     }
-    public void stopAudioProcessor(AudioProcessor adp, AudioDispatcher adpc, Thread thd){
+    public int stopAudioProcessor(AudioProcessor adp, AudioDispatcher adpc, Thread thd){
         adpc.stop();
         adpc.removeAudioProcessor(adp);
         thd.interrupt();
+        if(isScoring) return getScore();
+        return -1;
     }
 
-    public double getScore() {
-        double ret = -1;
+    public int getScore() {
 
+        double score = 0;
+        double totalTime = 0;
         //String scorePath = this.filePath + "/scoring/";
         //File file = new File(scorePath, "mywayscore.txt");
 
@@ -127,7 +130,28 @@ public class AudioController{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return ret;
+        //calculate Total time on the scorecard
+        for(int i = 0; i < singerStartTime.size(); i++)
+        {
+            totalTime += singerEndTime.get(i) - singerStartTime.get(i);
+        }
+
+
+        //Scoring
+        int i = 0;
+        int j = 0;
+        while(j <= singerStartTime.size() || i <= CalculateScore.Time.size()) {
+            if (CalculateScore.Time.get(i) > singerStartTime.get(j) || CalculateScore.Time.get(i) < singerEndTime.get(j)) {
+                score += (singerEndTime.get(j) - singerStartTime.get(j)) / totalTime;
+                i++;
+                j++;
+            } else
+                i++;
+        }
+
+
+
+        return (int)score;
     }
 
 }
@@ -271,29 +295,8 @@ class  MyPitchDetector implements PitchDetectionHandler{
                 String message = String.format("Pitch detected at %d 분 %d초, %.2f: %.2fHz ( %.2f probability, RMS: %.5f ) %s",
                         pMinute, pSecond, timeStamp, pitch,probability,rms,tInterval);
                 Log.d("test", message);
-                if(tried == 0) {
-                    CalculateScore.startTime.add(timeStamp);
-                    CalculateScore.endTime.add(timeStamp);
-                    CalculateScore.subInterval1.add(intvNum);
-                    CalculateScore.subInterval2.add(intvNum);
-                    //CalculateScore.realInterval.add(null);
-                    tried++;
-                }
-                else if(((CalculateScore.subInterval1.get(idx)) - intvNum) == 0 || Math.abs(((CalculateScore.subInterval1.get(idx)) - intvNum)) == 1) {
-                    CalculateScore.endTime.set(idx, timeStamp);
-                    CalculateScore.subInterval2.set(idx, intvNum);
-
-                }
-                else {
-                    CalculateScore.endTime.set(idx, timeStamp);
-                    CalculateScore.startTime.add(timeStamp);
-                    CalculateScore.endTime.add(timeStamp);
-                    CalculateScore.subInterval1.add(intvNum);
-                    CalculateScore.subInterval2.add(intvNum);
-                    //CalculateScore.realInterval.add(null);
-                    idx++;
-                }
-
+                CalculateScore.Time.add(timeStamp);
+                CalculateScore.Interval.add(intvNum);
             }
         }
     }
@@ -301,11 +304,8 @@ class  MyPitchDetector implements PitchDetectionHandler{
 
 
 class CalculateScore {
-    public static ArrayList<Double> startTime = new ArrayList<>();
-    public static ArrayList<Double> endTime = new ArrayList<>();
-    public static ArrayList<Integer> subInterval1 = new ArrayList<>();
-    public static ArrayList<Integer> subInterval2 = new ArrayList<>();
-    //public static ArrayList<Integer> realInterval = new ArrayList<>();
+    public static ArrayList<Double> Time = new ArrayList<>();
+    public static ArrayList<Integer> Interval = new ArrayList<>();
 }
 
 

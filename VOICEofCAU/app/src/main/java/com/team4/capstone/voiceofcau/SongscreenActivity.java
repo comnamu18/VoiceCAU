@@ -65,9 +65,10 @@ public class SongscreenActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
+                int a = audioController.stopAudioProcessor(audioController.audioProcessor, audioController.dispatcher, audioController.scoreThread);
+                intent.putExtra("Score", a);
                 startActivity(intent);
-                //audioController 내부에 멈추는거 구현 해야함
-                audioController.stopAudioProcessor(audioController.audioProcessor, audioController.dispatcher, audioController.scoreThread);
+                finish();
             }
         });
 
