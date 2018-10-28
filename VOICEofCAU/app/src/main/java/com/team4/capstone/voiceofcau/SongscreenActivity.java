@@ -61,12 +61,11 @@ public class SongscreenActivity extends AppCompatActivity {
         videoView.start();
 
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
-                int a = audioController.stopAudioProcessor(audioController.audioProcessor, audioController.dispatcher, audioController.scoreThread);
-                intent.putExtra("Score", a);
+                int score = audioController.stopAudioProcessor();
+                intent.putExtra("Score", score);
                 startActivity(intent);
                 finish();
             }

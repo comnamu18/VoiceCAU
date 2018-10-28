@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class ScoreActivity extends AppCompatActivity {
 
@@ -12,6 +13,17 @@ public class ScoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score);
+
+        TextView textView = (TextView)findViewById(R.id.scoreText);
+        Intent intent = getIntent();
+        int score = intent.getIntExtra("Score", -1);
+        if(score != -1) {
+            String scoreStr = String.valueOf(score) + "점!";
+            textView.setText(scoreStr);
+        }
+        else {
+            textView.setText("수고하셨습니다!");
+        }
 
         Button btn1 = (Button)findViewById(R.id.score_button1);
         btn1.setOnClickListener(new View.OnClickListener(){
@@ -41,9 +53,7 @@ public class ScoreActivity extends AppCompatActivity {
     @Override
 
     public void onBackPressed() {
-        Intent intent = new Intent(this, PopupActivity.class);
-        intent.putExtra("data", "Test Popup");
-        startActivityForResult(intent, 1);
+        finish();
     }
 
 }

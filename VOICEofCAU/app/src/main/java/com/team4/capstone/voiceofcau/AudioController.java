@@ -85,10 +85,10 @@ public class AudioController{
         scoreThread.start();
 
     }
-    public int stopAudioProcessor(AudioProcessor adp, AudioDispatcher adpc, Thread thd){
-        adpc.stop();
-        adpc.removeAudioProcessor(adp);
-        thd.interrupt();
+    public int stopAudioProcessor(){
+        dispatcher.stop();
+        dispatcher.removeAudioProcessor(audioProcessor);
+        scoreThread.interrupt();
         if(isScoring) return getScore();
         return -1;
     }
