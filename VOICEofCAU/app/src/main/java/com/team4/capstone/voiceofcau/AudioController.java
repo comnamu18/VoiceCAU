@@ -45,8 +45,11 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 
+import static java.lang.Math.abs;
+
 public class AudioController{
     boolean isScoring = false;
+    boolean isRecord = false;
     String SongName;
     String filePath;
     Context context;
@@ -56,10 +59,13 @@ public class AudioController{
     public AudioController(Context context, String filePath, String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
         this.isScoring = isScoring;
+        this.isRecord = isRecord;
         this.filePath = filePath;
         this.context = context;
         Log.d("TEST1", "Create1");
-
+        if(!isScoring || !isRecord){
+            return;
+        }
         int sampleRate = 22050;
         int audioBufferSize = 2048;
         int bufferOverlap = 0;
@@ -86,10 +92,12 @@ public class AudioController{
 
     }
     public int stopAudioProcessor(){
-        dispatcher.stop();
-        dispatcher.removeAudioProcessor(audioProcessor);
-        scoreThread.interrupt();
-        if(isScoring) return getScore();
+        if(isScoring || isRecord){
+            dispatcher.stop();
+            dispatcher.removeAudioProcessor(audioProcessor);
+            scoreThread.interrupt();
+            return getScore();
+        }
         return -1;
     }
 
@@ -133,7 +141,9 @@ public class AudioController{
         //calculate Total time on the scorecard
         for(int i = 0; i < singerStartTime.size(); i++)
         {
-            totalTime += singerEndTime.get(i) - singerStartTime.get(i);
+            totalTime = totalTime +  (singerEndTime.get(i) - singerStartTime.get(i));
+            String message = String.format("Total Time = %f", totalTime);
+            Log.d("Total time", message);
         }
 
 
@@ -141,19 +151,41 @@ public class AudioController{
         int i = 0;
         int j = 0;
         while(j < singerStartTime.size() && i < CalculateScore.Time.size()) {
-            if (CalculateScore.Time.get(i) > singerStartTime.get(j) || CalculateScore.Time.get(i) < singerEndTime.get(j)) {
+            if (CalculateScore.Time.get(i) > (singerStartTime.get(j)) && CalculateScore.Time.get(i) < (singerEndTime.get(j))) {
+                //시간은 맞을 때
                 if(CalculateScore.Interval.get(i) == singerSubInterval1.get(j) || CalculateScore.Interval.get(i) == singerSubInterval2.get(j)) {
-                    score += (singerEndTime.get(j) - singerStartTime.get(j)) / totalTime;
+                    score += ((singerEndTime.get(j) - singerStartTime.get(j)) / totalTime)*100;
+                    String message = String.format("case 1 Score = %f, CalculateScoreTime : %f, CalculateScoreInterval : %d , i: %d, j: %d",
+                            score, CalculateScore.Time.get(i), CalculateScore.Interval.get(i), i, j);
+                    Log.d("test1", message);
                     i++;
                     j++;
                 }
-                else
+                else if((singerSubInterval1.get(j) == singerSubInterval2.get(j)) && (abs(CalculateScore.Interval.get(i) - singerSubInterval1.get(j)) == 1)){
+                    score += ((singerEndTime.get(j) - singerStartTime.get(j)) / totalTime) * 50;
                     i++;
+                    j++;
+                }
+                //시간은 맞는데 음정이 다를 때
+                else {
+                    String message = String.format("case 2 Score = %f, %d, %d : Time O Interval X", score, i, j);
+                    Log.d("test2", message);
+                    i++;
+                }
             }
-            else if(CalculateScore.Time.get(i) > singerEndTime.get(j))
+            //입력시간이 채점표시간을 뛰어넘었을 때
+
+            else if(CalculateScore.Time.get(i) > singerEndTime.get(j)) {
+                String message = String.format("case 3 Score = %f : Time X (over), %d, %d", score, i, j);
+                Log.d("test3", message);
                 j++;
-            else
+            }
+            //입력시간이 채점표 시간보다 작을때
+            else if(CalculateScore.Time.get(i) < singerStartTime.get(j)){
+                String message = String.format("case 4 Score = %f : Time X (low), %d, %d", score, i, j);
+                Log.d("test4", message);
                 i++;
+            }
         }
 
 
@@ -298,12 +330,14 @@ class  MyPitchDetector implements PitchDetectionHandler{
 
 
             //Converting Ended
-            if(pitch < 8000 && probability > 0.85) {
+            if(pitch < 8000) {
                 String message = String.format("Pitch detected at %d 분 %d초, %.2f: %.2fHz ( %.2f probability, RMS: %.5f ) %s",
                         pMinute, pSecond, timeStamp, pitch,probability,rms,tInterval);
                 Log.d("test", message);
-                CalculateScore.Time.add(timeStamp);
-                CalculateScore.Interval.add(intvNum);
+                if(intvNum!=-1) {
+                    CalculateScore.Time.add(timeStamp);
+                    CalculateScore.Interval.add(intvNum);
+                }
             }
         }
     }

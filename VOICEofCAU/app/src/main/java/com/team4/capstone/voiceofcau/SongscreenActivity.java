@@ -45,10 +45,9 @@ public class SongscreenActivity extends AppCompatActivity {
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
-        if(isRecord || isScoring){
-            final AudioController audioController = new AudioController(
-                    getApplicationContext(), SongPath, SongName, isRecord, isScoring);
-        }
+        final AudioController audioController = new AudioController(
+                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
+
 
         videoView =
                 (VideoView) findViewById(R.id.videoView);
@@ -91,12 +90,11 @@ public class SongscreenActivity extends AppCompatActivity {
             else if(resultCode==RESULT_BEGIN){
                 //데이터 받기
                 videoView.seekTo(0);
-                //AdudioController 소멸자 필요
-                //AudioController 재 생성 필요
+                int score = audioController.stopAudioProcessor();
                 videoView.start();
             }
             else if(resultCode==RESULT_MAIN){
-                //AdudioController 소멸자 필요
+                int score = audioController.stopAudioProcessor();
                 finish();
             }
         }
