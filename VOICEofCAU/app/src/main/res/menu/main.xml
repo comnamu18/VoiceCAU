@@ -15,4 +15,12 @@
         android:orderInCategory="100"
         android:title="sync"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="100"
+        android:title="search"
+        app:showAsAction="always" />
+
 </menu>

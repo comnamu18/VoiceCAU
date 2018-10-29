@@ -28,6 +28,7 @@
         <activity android:name=".SongscreenActivity" />
         <activity android:name=".ScoreActivity" />
         <activity android:name=".Detail_scoreActivity"></activity>
+        <activity android:name=".SearchActivity"></activity>
         <activity android:name=".PopupActivity"
             android:theme="@android:style/Theme.Dialog"></activity>
     </application>

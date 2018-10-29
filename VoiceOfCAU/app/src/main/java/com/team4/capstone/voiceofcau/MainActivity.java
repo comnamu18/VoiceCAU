@@ -210,8 +210,19 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+
+        else if (id == R.id.action_search) {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        }
+
         return super.onOptionsItemSelected(item);
     }
+
+
+
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -228,6 +239,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         }
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
