@@ -140,12 +140,19 @@ public class AudioController{
         //Scoring
         int i = 0;
         int j = 0;
-        while(j <= singerStartTime.size() || i <= CalculateScore.Time.size()) {
+        while(j < singerStartTime.size() && i < CalculateScore.Time.size()) {
             if (CalculateScore.Time.get(i) > singerStartTime.get(j) || CalculateScore.Time.get(i) < singerEndTime.get(j)) {
-                score += (singerEndTime.get(j) - singerStartTime.get(j)) / totalTime;
-                i++;
+                if(CalculateScore.Interval.get(i) == singerSubInterval1.get(j) || CalculateScore.Interval.get(i) == singerSubInterval2.get(j)) {
+                    score += (singerEndTime.get(j) - singerStartTime.get(j)) / totalTime;
+                    i++;
+                    j++;
+                }
+                else
+                    i++;
+            }
+            else if(CalculateScore.Time.get(i) > singerEndTime.get(j))
                 j++;
-            } else
+            else
                 i++;
         }
 
