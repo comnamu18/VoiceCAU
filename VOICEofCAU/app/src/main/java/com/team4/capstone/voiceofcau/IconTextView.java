@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 public class IconTextView extends LinearLayout {
 
-    //private란 변경이 되면 안 되는 변수에 대해 접근 제한 자 설정
     private ImageView mIcon;
     private TextView mText01;
     private TextView mText02;
@@ -47,9 +46,7 @@ public class IconTextView extends LinearLayout {
         mText03.setText(aItem.getData(2));
     }
 
-
-
-//    //위에 방법과 구성은 동일한 방법이지만 조건 문과 파라메타 값으로 자동적으로 셋팅을 해주는것
+    //위에 방법과 구성은 동일한 방법이지만 조건 문과 파라메타 값으로 자동적으로 셋팅을 해주는것
     //파라메타로 Adapter 자바에서 설정된 int형 index 값과 String형 데이터 값을 가져와서 위처럼 변수를 자동으로 설정해줌
     public void setText(int index, String data){
         if (index == 0 ){
@@ -66,11 +63,9 @@ public class IconTextView extends LinearLayout {
     public void setIcon(Drawable icon){
         mIcon.setImageDrawable(icon);
     }
-
     public IconTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
     public IconTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }

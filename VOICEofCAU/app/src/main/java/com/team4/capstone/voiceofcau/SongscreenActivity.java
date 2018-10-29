@@ -17,12 +17,14 @@ import android.widget.VideoView;
 public class SongscreenActivity extends AppCompatActivity {
     MediaRecorder mRecorder;
     SharedPreferences prefs;
+    String Song;
     String SongName;
     MediaController mediaController;
     VideoView videoView;
     AudioController audioController;
     boolean isRecord;
     boolean isScoring;
+    public static final int RESULT_TRUE = 1;
     public static final int RESULT_MAIN = 45;
     public static final int RESULT_CONT = 44;
     public static final int RESULT_BEGIN = 43;
@@ -37,7 +39,7 @@ public class SongscreenActivity extends AppCompatActivity {
         isScoring = prefs.getBoolean("isScoring", true);
 
         Intent intent = getIntent();
-        String Song = intent.getStringExtra("Songname");
+        Song = intent.getStringExtra("Songname");
         SongName = Song.split("_")[0];
         String SongPath = Song.split("_")[1];
 
@@ -45,12 +47,10 @@ public class SongscreenActivity extends AppCompatActivity {
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
-        final AudioController audioController = new AudioController(
+        audioController = new AudioController(
                 getApplicationContext(), SongPath, SongName, isRecord, isScoring);
 
-
-        videoView =
-                (VideoView) findViewById(R.id.videoView);
+        videoView = (VideoView) findViewById(R.id.videoView);
         mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
         Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
@@ -64,12 +64,12 @@ public class SongscreenActivity extends AppCompatActivity {
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
                 int score = audioController.stopAudioProcessor();
-                intent.putExtra("Score", score);
+                Song = Song + "_" + String.valueOf(score);
+                intent.putExtra("Score", Song);
                 startActivity(intent);
                 finish();
             }
         });
-
     }
 
     @Override
@@ -77,28 +77,29 @@ public class SongscreenActivity extends AppCompatActivity {
             videoView.pause();
             //데이터 담아서 팝업(액티비티) 호출
             Intent intent = new Intent(this, PopupActivity.class);
-            startActivityForResult(intent,1);
+            startActivityForResult(intent,RESULT_TRUE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==1){
-            if(resultCode==RESULT_CONT){
-                //데이터 받기
-                videoView.start();
-            }
-            else if(resultCode==RESULT_BEGIN){
-                //데이터 받기
-                videoView.seekTo(0);
-                int score = audioController.stopAudioProcessor();
-                videoView.start();
-            }
-            else if(resultCode==RESULT_MAIN){
-                int score = audioController.stopAudioProcessor();
-                finish();
+        if(requestCode == RESULT_TRUE){
+            switch (resultCode){
+                case RESULT_CONT:
+                    videoView.start();
+                    break;
+                case RESULT_BEGIN:
+                    audioController.stopAudioProcessor();
+                    Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                    intent.putExtra("Songname", Song);
+                    startActivity(intent);
+                    finish();
+                    break;
+                case RESULT_MAIN:
+                    audioController.stopAudioProcessor();
+                    finish();
+                    break;
             }
         }
     }
-
 
 }

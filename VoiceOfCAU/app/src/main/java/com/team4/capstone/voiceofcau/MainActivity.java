@@ -1,9 +1,14 @@
 package com.team4.capstone.voiceofcau;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +30,10 @@ public class MainActivity extends AppCompatActivity
     ListView listView;
     IconTextListAdapter adapter;
     SharedPreferences prefs;
+    static final int MY_RECORD_PERMISSION = 78;
+    static final int MY_SAVING_PERMISSION = 79;
+    boolean isReocrdPermission = false;
+    boolean isSavingPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,11 +145,42 @@ public class MainActivity extends AppCompatActivity
             IdentityManager.getDefaultIdentityManager().signOut();
         }
     }
-
+    public boolean getRecordPermission(){
+        int recordPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO);
+        if (recordPermission != PackageManager.PERMISSION_GRANTED) {
+            Log.d("SAVING", "NOT GRANTED");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    MY_RECORD_PERMISSION);
+        }
+        else {
+            return true;
+        }
+        return false;
+    }
+    public boolean getSavingPermission(){
+        int savingPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (savingPermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    MY_SAVING_PERMISSION);
+        }
+        else {
+            return true;
+        }
+        return false;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        //ask for permission
+        getRecordPermission();
+        getSavingPermission();
+
+        //basic settings based on shared preferences
         prefs = getSharedPreferences("MODE", MODE_PRIVATE);
         SharedPreferences.Editor ed = prefs.edit();
         if(!prefs.contains("isRecord")){
@@ -149,11 +189,12 @@ public class MainActivity extends AppCompatActivity
         else{
             MenuItem item = menu.findItem(R.id.action_record);
             boolean isRecord = prefs.getBoolean("isRecord", true);
-            if (isRecord) {
+            if (isRecord && isReocrdPermission && isSavingPermission) {
                 item.setIcon(R.drawable.mic_on);
             }
-            else {
-                item.setIcon(R.drawable.mic_off);
+            //If permission denied then change settings as false
+            else if (isRecord) {
+                ed.putBoolean("isRecord", false);
             }
         }
         if(!prefs.contains("isScoring")){
@@ -162,17 +203,41 @@ public class MainActivity extends AppCompatActivity
         else{
             MenuItem item = menu.findItem(R.id.action_sync);
             boolean isScoring = prefs.getBoolean("isScoring", true);
-            if (isScoring) {
+            if (isScoring && isReocrdPermission) {
                 item.setIcon(R.drawable.pen_on);
             }
-            else {
-                item.setIcon(R.drawable.pen_off);
+            //If permission denied then change settings as false
+            else if (isScoring) {
+                ed.putBoolean("isScoring", false);
             }
         }
         ed.commit();
         return true;
     }
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_RECORD_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    isReocrdPermission = true;
+                } else {
+                    isReocrdPermission = false;
+                }
+                return;
+            }
+            case MY_SAVING_PERMISSION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    isSavingPermission = true;
+                } else {
+                    isSavingPermission = false;
+                }
+                return;
+            }
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -182,34 +247,51 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_record) {
-            boolean isRecord = !prefs.getBoolean("isRecord", true);
-            SharedPreferences.Editor ed = prefs.edit();
-            ed.putBoolean("isRecord", isRecord);
-            ed.commit();
-            if (isRecord) {
-                item.setIcon(R.drawable.mic_on);
-                Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
+            // check currently permission is true
+            boolean checkPermission = getRecordPermission() && getSavingPermission();
+            // if already has permissions or changed permissions
+            if (checkPermission || (isSavingPermission && isReocrdPermission)){
+                boolean isRecord = !prefs.getBoolean("isRecord", true);
+                SharedPreferences.Editor ed = prefs.edit();
+                ed.putBoolean("isRecord", isRecord);
+                ed.commit();
+                if (isRecord) {
+                    item.setIcon(R.drawable.mic_on);
+                    Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    item.setIcon(R.drawable.mic_off);
+                    Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
+                }
             }
-            else {
-                item.setIcon(R.drawable.mic_off);
-                Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
+            else{
+                Toast.makeText(getApplicationContext(),
+                        "record and write Permission needed for recording", Toast.LENGTH_LONG).show();
             }
         }
         else if (id == R.id.action_sync) {
-            boolean isRecord = !prefs.getBoolean("isScoring", true);
-            SharedPreferences.Editor ed = prefs.edit();
-            ed.putBoolean("isScoring", isRecord);
-            ed.commit();
-            if (isRecord) {
-                item.setIcon(R.drawable.pen_on);
-                Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
+            // check currently permission is true
+            boolean checkPermission = getRecordPermission();
+            // if already has permissions or changed permissions
+            if (checkPermission || isReocrdPermission){
+                boolean isRecord = !prefs.getBoolean("isScoring", true);
+                SharedPreferences.Editor ed = prefs.edit();
+                ed.putBoolean("isScoring", isRecord);
+                ed.commit();
+                if (isRecord) {
+                    item.setIcon(R.drawable.pen_on);
+                    Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    item.setIcon(R.drawable.pen_off);
+                    Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
+                }
             }
-            else {
-                item.setIcon(R.drawable.pen_off);
-                Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
+            else{
+                Toast.makeText(getApplicationContext(),
+                        "record Permission needed for scoring", Toast.LENGTH_LONG).show();
             }
         }
-
 
         else if (id == R.id.action_search) {
             Intent intent = new Intent(this, SearchActivity.class);
@@ -218,11 +300,6 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

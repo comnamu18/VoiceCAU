@@ -29,19 +29,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/score_button1"
+        android:id="@+id/score_mainbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp"
         android:text="메인화면"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/score_button2"
-        app:layout_constraintEnd_toStartOf="@+id/score_button2"
+        app:layout_constraintBaseline_toBaselineOf="@+id/score_detailbutton"
+        app:layout_constraintEnd_toStartOf="@+id/score_detailbutton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/score_button2"
+        android:id="@+id/score_detailbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="68dp"
@@ -49,16 +49,16 @@
         android:text="정밀채점"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/score_button3"
-        app:layout_constraintStart_toEndOf="@+id/score_button1" />
+        app:layout_constraintEnd_toStartOf="@+id/score_retrybutton"
+        app:layout_constraintStart_toEndOf="@+id/score_mainbutton" />
 
     <Button
-        android:id="@+id/score_button3"
+        android:id="@+id/score_retrybutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="다시하기"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/score_button2"
+        app:layout_constraintBaseline_toBaselineOf="@+id/score_detailbutton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/score_button2" />
+        app:layout_constraintStart_toEndOf="@+id/score_detailbutton" />
 </android.support.constraint.ConstraintLayout>

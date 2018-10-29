@@ -16,24 +16,25 @@ public class ScoreActivity extends AppCompatActivity {
 
         TextView textView = (TextView)findViewById(R.id.scoreText);
         Intent intent = getIntent();
-        int score = intent.getIntExtra("Score", -1);
-        if(score != -1) {
-            String scoreStr = String.valueOf(score) + "점!";
+        final String rawScore = intent.getStringExtra("Score");
+        String SongName = rawScore.split("_")[0];
+        String score = rawScore.split("_")[2];
+        if(score != "-1") {
+            String scoreStr = score + "점!";
             textView.setText(scoreStr);
         }
         else {
             textView.setText("수고하셨습니다!");
         }
 
-        Button btn1 = (Button)findViewById(R.id.score_button1);
+        Button btn1 = (Button)findViewById(R.id.score_mainbutton);
         btn1.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
+                finish();
             }
         });
 
-        Button btn2 = (Button)findViewById(R.id.score_button2);
+        Button btn2 = (Button)findViewById(R.id.score_detailbutton);
         btn2.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(getApplicationContext(), Detail_scoreActivity.class);
@@ -41,10 +42,12 @@ public class ScoreActivity extends AppCompatActivity {
             }
         });
 
-        Button btn3 = (Button)findViewById(R.id.score_button3);
+        Button btn3 = (Button)findViewById(R.id.score_retrybutton);
         btn3.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                String reTry = rawScore.split("_")[0] + "_" + rawScore.split("_")[1];
+                intent.putExtra("Songname", reTry);
                 startActivity(intent);
             }
         });

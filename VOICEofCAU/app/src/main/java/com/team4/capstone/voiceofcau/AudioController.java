@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,38 +57,31 @@ public class AudioController{
     Thread scoreThread;
     AudioDispatcher dispatcher;
     AudioProcessor audioProcessor;
+    FileOutputStream outputStream;
+
     public AudioController(Context context, String filePath, String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
         this.isScoring = isScoring;
         this.isRecord = isRecord;
         this.filePath = filePath;
         this.context = context;
-        Log.d("TEST1", "Create1");
         if(!isScoring || !isRecord){
             return;
         }
         int sampleRate = 22050;
         int audioBufferSize = 2048;
-        int bufferOverlap = 0;
 
-        AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 4096);
-        Log.d("TEST2", "Stream CReated");
+        AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                sampleRate, AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, 4096);
         //Convert into TarsosDSP API
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(sampleRate, 16, 1, true, false);
         TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
-        Log.d("TEST3", "TarsosDSP CReated");
-        stream.startRecording();
         dispatcher = new AudioDispatcher(audioStream, 2048, 0);
-
-
         MyPitchDetector myPitchDetector = new MyPitchDetector();
-        Log.d("TEST4", "Dispatcher CReated");
-        //dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,2048,0);
         audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN, 22050, audioBufferSize, myPitchDetector);
         dispatcher.addAudioProcessor(audioProcessor);
-        Log.d("TEST10", "Stream CReated");
+        stream.startRecording();
         scoreThread = new Thread(dispatcher, "Dispatcher");
-
         scoreThread.start();
 
     }
@@ -102,11 +96,8 @@ public class AudioController{
     }
 
     public int getScore() {
-
         double score = 0;
         double totalTime = 0;
-        //String scorePath = this.filePath + "/scoring/";
-        //File file = new File(scorePath, "mywayscore.txt");
 
         BufferedReader bufrd = null;
         String[] str;
@@ -115,12 +106,9 @@ public class AudioController{
         ArrayList<Double> singerEndTime = new ArrayList<>();
         ArrayList<Integer> singerSubInterval1 = new ArrayList<>();
         ArrayList<Integer> singerSubInterval2 = new ArrayList<>();
-        ArrayList<String> singerTest = new ArrayList<>();
         StringTokenizer myTokens;
 
-        int trytoken = 0;
         try {
-            //final CSVReader reader = new CSVReader(new InputStreamReader(getAssets().open("mywayscore.csv")));
             InputStreamReader is = new InputStreamReader(context.getAssets().open("mywayscore.csv"));
             BufferedReader reader = new BufferedReader(is);
             String str2;
@@ -133,9 +121,7 @@ public class AudioController{
                 singerSubInterval2.add(Integer.parseInt(myTokens.nextToken()));
             }
             reader.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         //calculate Total time on the scorecard
@@ -145,7 +131,6 @@ public class AudioController{
             String message = String.format("Total Time = %f", totalTime);
             Log.d("Total time", message);
         }
-
 
         //Scoring
         int i = 0;
@@ -187,12 +172,11 @@ public class AudioController{
                 i++;
             }
         }
-
-
+        CalculateScore.Time.clear();
+        CalculateScore.Interval.clear();
 
         return (int)score;
     }
-
 }
 
 class  MyPitchDetector implements PitchDetectionHandler{
@@ -327,8 +311,6 @@ class  MyPitchDetector implements PitchDetectionHandler{
                 tInterval = "null";
                 intvNum=-1;
             }
-
-
             //Converting Ended
             if(pitch < 8000) {
                 String message = String.format("Pitch detected at %d 분 %d초, %.2f: %.2fHz ( %.2f probability, RMS: %.5f ) %s",
