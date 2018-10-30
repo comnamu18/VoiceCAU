@@ -65,7 +65,7 @@ public class AudioController{
         this.isRecord = isRecord;
         this.filePath = filePath;
         this.context = context;
-        if(!isScoring || !isRecord){
+        if(!isScoring && !isRecord){
             return;
         }
         int sampleRate = 22050;
