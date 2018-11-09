@@ -36,4 +36,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/TarsosDSP-Android-latest.jar')
     implementation files('libs/opencsv-4.2.jar')
+    //For File Storage
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.+'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.+'
 }

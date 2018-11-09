@@ -31,6 +31,10 @@
         <activity android:name=".SearchActivity"></activity>
         <activity android:name=".PopupActivity"
             android:theme="@android:style/Theme.Dialog"></activity>
+        <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
+
     </application>
+
+
 
 </manifest>
