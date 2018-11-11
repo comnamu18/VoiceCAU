@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity
     public static final int RESULT_CANCEL = -1;
     public static final int SUCCESS_FROM_POPUP = 1;
     public static final int SUCCESS_FROM_SEARCH = 2;
+    public static final int RESULT_MAIN = 45;
+    public static final int RESULT_CONT = 44;
+    public static final int RESULT_BEGIN = 43;
 
     boolean isReocrdPermission = false;
     boolean isSavingPermission = false;

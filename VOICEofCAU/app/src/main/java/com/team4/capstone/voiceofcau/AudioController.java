@@ -20,8 +20,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.lang.*;
+import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 
@@ -61,6 +64,7 @@ public class AudioController{
     AudioRecord stream;
     File waveFile;
     File tempFile;
+    File finalFile;
 
     public AudioController(Context context, final String filePath, final String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
@@ -72,8 +76,9 @@ public class AudioController{
             return;
         }
         int audioBufferSize = 2048;
-
+        String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.KOREA).format(new Date());
         //Setting Files
+        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "_" + date + ".aac");
         waveFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "TEST.wav");
         tempFile = new File(Environment.getExternalStorageDirectory()+"/"+TEMP_FILE_NAME);
 
@@ -85,12 +90,12 @@ public class AudioController{
 
         BUFFER_SIZE = 4096;
         stream = createAudioRecord();
-        //Convert into TarsosDSP API
+
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
                 RECORDER_BPP, 1, true, false);
         TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
         dispatcher = new AudioDispatcher(audioStream, audioBufferSize, 0);
-        MyPitchDetector myPitchDetector = new MyPitchDetector(mBOStream, stream, BUFFER_SIZE, isRecord);
+        MyPitchDetector myPitchDetector = new MyPitchDetector(mBOStream, BUFFER_SIZE, isRecord);
         audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN,
                 RECORDER_SAMPLERATE, audioBufferSize, myPitchDetector);
         dispatcher.addAudioProcessor(audioProcessor);
@@ -171,6 +176,7 @@ public class AudioController{
     }
     public int stopAudioProcessor(){
         if (isRecord) {
+            // Saving as File
             try{
                 int read;
                 mBOStream.flush();
@@ -187,13 +193,9 @@ public class AudioController{
                 mBOStream.close();
             }catch (Exception e) {
             }
-            stream.stop();
-            stream.release();
         }
-        if(isScoring){
-            if(!isRecord){
-                dispatcher.stop();
-            }
+        if(isScoring || isRecord){
+            dispatcher.stop();
             dispatcher.removeAudioProcessor(audioProcessor);
             scoreThread.interrupt();
             scoreThread = null;
@@ -286,13 +288,11 @@ public class AudioController{
 
 class  MyPitchDetector implements PitchDetectionHandler{
     private BufferedOutputStream mBOStream;
-    private AudioRecord stream;
     private int BUFFER_SIZE;
     private boolean isRecord;
     byte[] data;
-    public MyPitchDetector(BufferedOutputStream mBOStream, AudioRecord stream, int BUFFER_SIZE, boolean isRecord){
+    public MyPitchDetector(BufferedOutputStream mBOStream, int BUFFER_SIZE, boolean isRecord){
         this.mBOStream = mBOStream;
-        this.stream = stream;
         this.BUFFER_SIZE = BUFFER_SIZE;
         data = new byte[BUFFER_SIZE];
         this.isRecord = isRecord;
@@ -301,23 +301,23 @@ class  MyPitchDetector implements PitchDetectionHandler{
     @Override
     public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
         float pitch = pitchDetectionResult.getPitch();
+
         if(isRecord){
-            int read = 0;
-            read = stream.read(data, 0, BUFFER_SIZE);
+            data = audioEvent.getByteBuffer();
             try{
-                mBOStream.write(data, 0, read);
+                mBOStream.write(data, 0, BUFFER_SIZE);
             } catch (Exception e){
             }
 
         }
-        /*
+
         if(pitch != -1 && pitch < 8000){
             double timeStamp = audioEvent.getTimeStamp();
             int intvNum = getintvNum(pitch);
             CalculateScore.Time.add(timeStamp);
             CalculateScore.Interval.add(intvNum);
         }
-        */
+
     }
 
     private int getintvNum(float pitch) {

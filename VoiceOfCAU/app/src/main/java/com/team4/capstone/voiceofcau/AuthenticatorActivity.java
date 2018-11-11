@@ -1,5 +1,6 @@
 package com.team4.capstone.voiceofcau;
 
+import android.content.Intent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +35,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
             @Override
             public void onUserSignedIn() {
                 Log.d("LOG_TAG", "User Signed In");
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
             }
             // Sign-out listener
             @Override
