@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -30,15 +31,22 @@ public class MainActivity extends AppCompatActivity
     ListView listView;
     IconTextListAdapter adapter;
     SharedPreferences prefs;
-    static final int MY_RECORD_PERMISSION = 78;
-    static final int MY_SAVING_PERMISSION = 79;
+
+    public static final int MY_RECORD_PERMISSION = 78;
+    public static final int MY_SAVING_PERMISSION = 79;
+    public static final int RESULT_NORMAL = 55;
+    public static final int RESULT_PRACTICE = 54;
+    public static final int RESULT_DUET = 53;
+    public static final int RESULT_CANCEL = -1;
+    public static final int SUCCESS_FROM_POPUP = 1;
+    public static final int SUCCESS_FROM_SEARCH = 2;
+
     boolean isReocrdPermission = false;
     boolean isSavingPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -116,12 +124,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 IconTextItem curItem = (IconTextItem) adapter.getItem(position);
-                //총 3개의 값을 가져오기 때문에 첫 번째 제목을 보여주기 위해선 배열 0번째의 값을 나타내주면 됨
                 String[] curData=curItem.getData();
-                Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
-                String songData = curData[0] + "_" + curData[2];
+                Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
+                // songData[2] => 1 == From main / 2 == From songscreen
+                String songData = curData[0] + "_" + curData[2] + "_1";
+                Log.d("songData Test", songData);
                 intent.putExtra("Songname",songData);
-                startActivity(intent);
+                startActivityForResult(intent, SUCCESS_FROM_POPUP);
             }
         });
 
@@ -134,8 +143,91 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-    }
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomnavigation);
+        Menu menu = bottomNavigationView.getMenu();
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        int id = item.getItemId();
+                        Intent intent;
+                        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
+                        SharedPreferences.Editor ed = prefs.edit();
+                        switch (id){
+                            case R.id.action_record:
+                                if (!prefs.contains("isRecord")) {
+                                    ed.putBoolean("isRecord", false);
+                                } else {
+                                    if(!getRecordPermission()){
+                                        Toast.makeText(getApplicationContext(), "Record need MIC Permissions", Toast.LENGTH_LONG).show();
+                                        break;
+                                    }
+                                    boolean isRecord = !prefs.getBoolean("isRecord", true);
+                                    if (isRecord) {
+                                        item.setTitle("record On");
+                                        Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        item.setTitle("record Off");
+                                        Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
+                                    }
+                                    ed.putBoolean("isRecord", isRecord);
+                                    ed.commit();
+                                }
+                                break;
+                            case R.id.action_sync:
+                                if (!prefs.contains("isScoring")) {
+                                    ed.putBoolean("isScoring", false);
+                                } else {
+                                    if(!getSavingPermission()){
+                                        Toast.makeText(getApplicationContext(), "Scoring need MIC and SAVE Permissions", Toast.LENGTH_LONG).show();
+                                        break;
+                                    }
+                                    boolean isScoring = !prefs.getBoolean("isScoring", true);
+                                    if (isScoring) {
+                                        item.setTitle("Scoring On");
+                                        Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        item.setTitle("Scoring Off");
+                                        Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
+                                    }
+                                    ed.putBoolean("isScoring", isScoring);
+                                    ed.commit();
+                                }
+                                break;
+                            case R.id.action_search:
+                                intent = new Intent(getApplicationContext(), SearchActivity.class);
+                                startActivityForResult(intent, SUCCESS_FROM_SEARCH);
+                                break;
+                            case R.id.action_stat:
+                                intent = new Intent(getApplicationContext(), StatisticActivity.class);
+                                startActivity(intent);
+                                break;
+                        }
+                        return false;
+                    }
+                });
 
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case SUCCESS_FROM_POPUP:
+                String SongData = data.getStringExtra("SongData");
+                switch (resultCode) {
+                    case RESULT_CANCEL:
+                        break;
+                    default :
+                        Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                        intent.putExtra("Songname", SongData);
+                        startActivity(intent);
+                        break;
+                }
+                break;
+            case SUCCESS_FROM_SEARCH:
+                //찾은 노래 실행
+                break;
+        }
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -173,48 +265,6 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        //ask for permission
-        getRecordPermission();
-        getSavingPermission();
-
-        //basic settings based on shared preferences
-        prefs = getSharedPreferences("MODE", MODE_PRIVATE);
-        SharedPreferences.Editor ed = prefs.edit();
-        if(!prefs.contains("isRecord")){
-            ed.putBoolean("isRecord", false);
-        }
-        else{
-            MenuItem item = menu.findItem(R.id.action_record);
-            boolean isRecord = prefs.getBoolean("isRecord", true);
-            if (isRecord && isReocrdPermission && isSavingPermission) {
-                item.setIcon(R.drawable.mic_on);
-            }
-            //If permission denied then change settings as false
-            else if (isRecord) {
-                ed.putBoolean("isRecord", false);
-            }
-        }
-        if(!prefs.contains("isScoring")){
-            ed.putBoolean("isScoring", false);
-        }
-        else{
-            MenuItem item = menu.findItem(R.id.action_sync);
-            boolean isScoring = prefs.getBoolean("isScoring", true);
-            if (isScoring && isReocrdPermission) {
-                item.setIcon(R.drawable.pen_on);
-            }
-            //If permission denied then change settings as false
-            else if (isScoring) {
-                ed.putBoolean("isScoring", false);
-            }
-        }
-        ed.commit();
-        return true;
-    }
-    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_RECORD_PERMISSION: {
@@ -238,68 +288,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_record) {
-            // check currently permission is true
-            boolean checkPermission = getRecordPermission() && getSavingPermission();
-            // if already has permissions or changed permissions
-            if (checkPermission || (isSavingPermission && isReocrdPermission)){
-                boolean isRecord = !prefs.getBoolean("isRecord", true);
-                SharedPreferences.Editor ed = prefs.edit();
-                ed.putBoolean("isRecord", isRecord);
-                ed.commit();
-                if (isRecord) {
-                    item.setIcon(R.drawable.mic_on);
-                    Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
-                }
-                else {
-                    item.setIcon(R.drawable.mic_off);
-                    Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
-                }
-            }
-            else{
-                Toast.makeText(getApplicationContext(),
-                        "record and write Permission needed for recording", Toast.LENGTH_LONG).show();
-            }
-        }
-        else if (id == R.id.action_sync) {
-            // check currently permission is true
-            boolean checkPermission = getRecordPermission();
-            // if already has permissions or changed permissions
-            if (checkPermission || isReocrdPermission){
-                boolean isRecord = !prefs.getBoolean("isScoring", true);
-                SharedPreferences.Editor ed = prefs.edit();
-                ed.putBoolean("isScoring", isRecord);
-                ed.commit();
-                if (isRecord) {
-                    item.setIcon(R.drawable.pen_on);
-                    Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
-                }
-                else {
-                    item.setIcon(R.drawable.pen_off);
-                    Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
-                }
-            }
-            else{
-                Toast.makeText(getApplicationContext(),
-                        "record Permission needed for scoring", Toast.LENGTH_LONG).show();
-            }
-        }
-
-        else if (id == R.id.action_search) {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -316,8 +304,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         }
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

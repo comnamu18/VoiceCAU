@@ -32,7 +32,7 @@
             android:textSize="15sp"
             android:textColor="#000"
             android:alpha="0.87"
-            android:text="노래가 중지되었습니다!!"
+            android:text="@string/popup_notice"
             android:gravity="center"
             android:layout_marginBottom="3dp"
             android:layout_width="match_parent"
@@ -52,32 +52,35 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id = "@+id/popup_button1"
             android:layout_width="100dp"
             android:layout_height="53dp"
             android:background="#00000000"
             android:onClick="Return"
             android:padding="16dp"
-            android:text="다시하기"
+            android:text="@string/popup_button1"
             android:textColor="#ff7a00"
             android:textSize="15sp" />
 
         <Button
+            android:id = "@+id/popup_button2"
             android:layout_width="100dp"
             android:layout_height="53dp"
             android:background="#00000000"
             android:onClick="Continue"
             android:padding="16dp"
-            android:text="계속하기"
+            android:text="@string/popup_button2"
             android:textColor="#ff7a00"
             android:textSize="15sp" />
 
         <Button
+            android:id = "@+id/popup_button3"
             android:layout_width="100dp"
             android:layout_height="53dp"
             android:background="#00000000"
             android:onClick="Main"
             android:padding="16dp"
-            android:text="메인메뉴"
+            android:text="@string/popup_button3"
             android:textColor="#ff7a00"
             android:textSize="15sp" />
     </LinearLayout>

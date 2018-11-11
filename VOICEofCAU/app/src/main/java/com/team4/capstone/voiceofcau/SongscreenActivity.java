@@ -14,14 +14,17 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
+
+import java.util.TimerTask;
+
 public class SongscreenActivity extends AppCompatActivity {
-    MediaRecorder mRecorder;
     SharedPreferences prefs;
     String Song;
     String SongName;
     MediaController mediaController;
     VideoView videoView;
     AudioController audioController;
+
     boolean isRecord;
     boolean isScoring;
     public static final int RESULT_TRUE = 1;
@@ -70,6 +73,23 @@ public class SongscreenActivity extends AppCompatActivity {
                 finish();
             }
         });
+        class StopTask extends TimerTask {
+            private String SongName;
+            private int type; // type 1 is Audio(BackGround or Singer), 2 is Media(User)
+            public StopTask(String SongName, int type){
+                this.SongName = SongName;
+                this.type = type;
+            }
+            @Override
+            public void run() {
+                if (type == 1) {
+                    //Audio 소리 0
+                }
+                else{
+
+                }
+            }
+        }
     }
 
     @Override

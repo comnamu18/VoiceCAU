@@ -8,4 +8,10 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="popup_notice">노래가 중지되었습니다!!</string>
+    <string name="popup_button1">다시하기</string>
+    <string name="popup_button2">계속하기</string>
+    <string name="popup_button3">메인메뉴</string>
+    <string name="popup_button11">일반모드</string>
+    <string name="popup_button21">연습모드</string>
+    <string name="popup_button31">듀엣모드</string>
 </resources>

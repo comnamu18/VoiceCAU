@@ -29,7 +29,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 Log.d("Connection", "Created");
             }
         }).execute();
-
         // Sign-in listener
         IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
             @Override
@@ -61,5 +60,4 @@ public class AuthenticatorActivity extends AppCompatActivity {
         SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
         signin.login(AuthenticatorActivity.this, MainActivity.class).authUIConfiguration(config).execute();
     }
-
 }

@@ -2,57 +2,98 @@ package com.team4.capstone.voiceofcau;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class PopupActivity extends Activity {
     TextView txtText;
-
+    private String[] datas;
+    private int type;
+    private String songName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent data = getIntent();
+        Log.d("Intent Test", data.getStringExtra("Songname"));
+        datas = data.getStringExtra("Songname").split("_");
+        songName = datas[0];
+        type = Integer.parseInt(datas[2]);
         //타이틀바 없애기
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_popup);
 
         //UI 객체생성
         txtText = (TextView)findViewById(R.id.popupText);
-        txtText.setText(R.string.popup_notice);
+        if (type == 1){
+            txtText.setText(songName);
+            Button button = (Button)findViewById(R.id.popup_button1);
+            button.setText(R.string.popup_button11);
+            button = (Button)findViewById(R.id.popup_button2);
+            button.setText(R.string.popup_button21);
+            button = (Button)findViewById(R.id.popup_button3);
+            button.setText(R.string.popup_button31);
+        }
+        else{
+            txtText.setText(R.string.popup_notice);
+        }
 
     }
-
-    //돌아가기
+    //돌아가기 or 일반모드
     public void Return (View v){
-        Intent intent = new Intent();
-        setResult(SongscreenActivity.RESULT_BEGIN, intent);
-        //액티비티(팝업) 닫기
-        finish();
+        if(type == 1){
+            Intent intent = new Intent();
+            String SongData = datas[0] + "_" + datas[1] + "_1";
+            intent.putExtra("SongData", SongData);
+            setResult(MainActivity.RESULT_NORMAL, intent);
+            finish();
+        }
+        else {
+            setResult(SongscreenActivity.RESULT_BEGIN);
+            finish();
+        }
     }
-
-    //확인 버튼 클릭
+    //계속하기 or 연습모드
     public void Continue (View v){
-        Intent intent = new Intent();
-        setResult(SongscreenActivity.RESULT_CONT, intent);
-        //액티비티(팝업) 닫기
-        finish();
+        if(type == 1){
+            Intent intent = new Intent();
+            String SongData = datas[0] + "_" + datas[1] + "_2";
+            intent.putExtra("SongData", SongData);
+            setResult(MainActivity.RESULT_PRACTICE, intent);
+            finish();
+        }
+        else {
+            setResult(SongscreenActivity.RESULT_CONT);
+            finish();
+        }
     }
 
-    //메인 메뉴로 돌아가기
+    //메인 메뉴로 돌아가기 or 듀엣모드
     public void Main (View v){
-        //데이터 전달하기
-        Intent intent = new Intent();
-        setResult(SongscreenActivity.RESULT_MAIN, intent);
-        //액티비티(팝업) 닫기
-        finish();
+        if(type == 1){
+            Intent intent = new Intent();
+            String SongData = datas[0] + "_" + datas[1] + "_3";
+            intent.putExtra("SongData", SongData);
+            setResult(MainActivity.RESULT_DUET, intent);
+            finish();
+        }
+        else {
+            setResult(SongscreenActivity.RESULT_MAIN);
+            finish();
+        }
     }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(type == 1){
+            setResult(MainActivity.RESULT_CANCEL);
+            finish();
+        }
         //바깥레이어 클릭시 안닫히게
         if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
             return false;
@@ -62,6 +103,10 @@ public class PopupActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if(type == 1){
+            setResult(MainActivity.RESULT_CANCEL);
+            finish();
+        }
         //안드로이드 백버튼 막기
         return;
     }

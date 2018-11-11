@@ -22,5 +22,10 @@
         android:orderInCategory="100"
         android:title="search"
         app:showAsAction="always" />
-
+    <item
+        android:id="@+id/action_stat"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="100"
+        android:title="Statistic"
+        app:showAsAction="always" />
 </menu>

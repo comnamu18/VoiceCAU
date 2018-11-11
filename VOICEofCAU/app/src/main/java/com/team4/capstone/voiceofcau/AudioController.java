@@ -42,23 +42,25 @@ public class AudioController{
     private final String TEMP_FILE_NAME = "test_temp.bak";
     private final int HEADER_SIZE = 0x2c;
     private final int RECORDER_BPP = 16;
-    private final int RECORDER_SAMPLERATE = 0xac44;
+    private final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
+    private final int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
     private int BUFFER_SIZE;
-    private boolean SEMA_PHORE = false;
-    private boolean SEMA_DOWN = false;
+    private int RECORDER_SAMPLERATE;
+    byte[] buffer = new byte[BUFFER_SIZE];
     private BufferedInputStream mBIStream;
     private BufferedOutputStream mBOStream;
     private int mAudioLen = 0;
-    boolean isScoring = false;
-    boolean isRecord = false;
+    boolean isScoring;
+    boolean isRecord;
     String SongName;
     String filePath;
     Context context;
     private Thread scoreThread;
-    private Thread recordThread;
     AudioDispatcher dispatcher;
     AudioProcessor audioProcessor;
     AudioRecord stream;
+    File waveFile;
+    File tempFile;
 
     public AudioController(Context context, final String filePath, final String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
@@ -71,43 +73,9 @@ public class AudioController{
         }
         int audioBufferSize = 2048;
 
-        BUFFER_SIZE = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
-                AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT);
-        Log.d("BUFFER SIZE", String.valueOf(BUFFER_SIZE));
-        stream = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE,
-                AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, BUFFER_SIZE);
-
-        //Convert into TarsosDSP API
-        TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
-                RECORDER_BPP, 1, true, false);
-        TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
-        dispatcher = new AudioDispatcher(audioStream, audioBufferSize, 0);
-        MyPitchDetector myPitchDetector = new MyPitchDetector();
-        audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN,
-                RECORDER_SAMPLERATE, audioBufferSize, myPitchDetector);
-        dispatcher.addAudioProcessor(audioProcessor);
-        stream.startRecording();
-        if(isRecord){
-            SEMA_PHORE = true;
-            recordThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    writeAudioDataToFile(SongName, filePath);
-                }
-            }, "AudioRecorder Thread");
-            recordThread.start();
-        }
-        if(isScoring){
-            scoreThread = new Thread(dispatcher, "Dispatcher");
-            scoreThread.start();
-        }
-    }
-    private void writeAudioDataToFile(String SongName, String filePath) {
-        byte[] buffer = new byte[BUFFER_SIZE];
-        byte[] data = new byte[BUFFER_SIZE];
-        File waveFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "TEST.wav");
-        Log.d("DIRECTORY", waveFile.toString());
-        File tempFile = new File(Environment.getExternalStorageDirectory()+"/"+TEMP_FILE_NAME);
+        //Setting Files
+        waveFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "TEST.wav");
+        tempFile = new File(Environment.getExternalStorageDirectory()+"/"+TEMP_FILE_NAME);
 
         try {
             mBOStream = new BufferedOutputStream(new FileOutputStream(tempFile));
@@ -115,34 +83,42 @@ public class AudioController{
             e1.printStackTrace();
         }
 
-        int read = 0;
-        if (null != mBOStream) {
-            try {
-                while (SEMA_PHORE) {
-                    read = stream.read(data, 0, BUFFER_SIZE);
-                    if (AudioRecord.ERROR_INVALID_OPERATION != read) {
-                        mBOStream.write(data);
-                    }
-                }
-                mBOStream.flush();
-                mAudioLen = (int)tempFile.length();
-                mBIStream = new BufferedInputStream(new FileInputStream(tempFile));
-                mBOStream.close();
-                mBOStream = new BufferedOutputStream(new FileOutputStream(waveFile));
-                mBOStream.write(getFileHeader());
-                while ((read = mBIStream.read(buffer)) != -1) {
-                    mBOStream.write(buffer);
-                }
-                mBOStream.flush();
-                mBIStream.close();
-                mBOStream.close();
-                SEMA_DOWN = true;
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+        BUFFER_SIZE = 4096;
+        stream = createAudioRecord();
+        //Convert into TarsosDSP API
+        TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
+                RECORDER_BPP, 1, true, false);
+        TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
+        dispatcher = new AudioDispatcher(audioStream, audioBufferSize, 0);
+        MyPitchDetector myPitchDetector = new MyPitchDetector(mBOStream, stream, BUFFER_SIZE, isRecord);
+        audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN,
+                RECORDER_SAMPLERATE, audioBufferSize, myPitchDetector);
+        dispatcher.addAudioProcessor(audioProcessor);
+        stream.startRecording();
+        if(isScoring || isRecord){
+            scoreThread = new Thread(dispatcher, "Dispatcher");
+            scoreThread.start();
         }
     }
-
+    private AudioRecord createAudioRecord() {
+        int[] SAMPLE_RATE_CANDIDATES = {16000, 11025, 22050, 44100};
+        for (int sampleRate : SAMPLE_RATE_CANDIDATES) { // 후보군 for-loop
+            final int sizeInBytes = AudioRecord.getMinBufferSize(sampleRate, CHANNEL, ENCODING);
+            if (sizeInBytes == AudioRecord.ERROR_BAD_VALUE) { // 값이 비정상임
+                continue; // 통과
+            }
+            final AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                    sampleRate, CHANNEL, ENCODING, sizeInBytes); // AudioRecord init 시도
+            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) { // 성공?
+                buffer = new byte[sizeInBytes]; // byte[] 버퍼 생성
+                RECORDER_SAMPLERATE = sampleRate;
+                return audioRecord;
+            } else {
+                audioRecord.release(); // 실패했으니 릴리즈.
+            }
+        }
+        return null;
+    }
     private byte[] getFileHeader() {
         byte[] header = new byte[HEADER_SIZE];
         int totalDataLen = mAudioLen + 40;
@@ -193,17 +169,26 @@ public class AudioController{
         header[43] = (byte)((mAudioLen >> 24) & 0xff);
         return header;
     }
-
     public int stopAudioProcessor(){
         if (isRecord) {
-            SEMA_PHORE = false;
-            while(!SEMA_DOWN){
-                //WAIT FOR RECORD THREAD STOP
+            try{
+                int read;
+                mBOStream.flush();
+                mAudioLen = (int)tempFile.length();
+                mBIStream = new BufferedInputStream(new FileInputStream(tempFile));
+                mBOStream.close();
+                mBOStream = new BufferedOutputStream(new FileOutputStream(waveFile));
+                mBOStream.write(getFileHeader());
+                while ((read = mBIStream.read(buffer)) != -1) {
+                    mBOStream.write(buffer);
+                }
+                mBOStream.flush();
+                mBIStream.close();
+                mBOStream.close();
+            }catch (Exception e) {
             }
-            recordThread.interrupt();
             stream.stop();
             stream.release();
-            recordThread = null;
         }
         if(isScoring){
             if(!isRecord){
@@ -212,12 +197,11 @@ public class AudioController{
             dispatcher.removeAudioProcessor(audioProcessor);
             scoreThread.interrupt();
             scoreThread = null;
-            return getScore(SongName);
+            return getScore();
         }
         return -1;
     }
-
-    public int getScore(String SongName) {
+    public int getScore() {
         double score = 0;
         double totalTime = 0;
 
@@ -301,36 +285,42 @@ public class AudioController{
 }
 
 class  MyPitchDetector implements PitchDetectionHandler{
-    static int tried = 0;
-    static int idx = 0;
+    private BufferedOutputStream mBOStream;
+    private AudioRecord stream;
+    private int BUFFER_SIZE;
+    private boolean isRecord;
+    byte[] data;
+    public MyPitchDetector(BufferedOutputStream mBOStream, AudioRecord stream, int BUFFER_SIZE, boolean isRecord){
+        this.mBOStream = mBOStream;
+        this.stream = stream;
+        this.BUFFER_SIZE = BUFFER_SIZE;
+        data = new byte[BUFFER_SIZE];
+        this.isRecord = isRecord;
+    }
     //Here the result of pitch is always less than half.
     @Override
     public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
-        if(pitchDetectionResult.getPitch() != -1){
-            double timeStamp = audioEvent.getTimeStamp();
-            float pitch = pitchDetectionResult.getPitch();
-            float probability = pitchDetectionResult.getProbability();
-            int pMinute = (int) (timeStamp/60);
-            int pSecond = (int) (timeStamp%60);
-            int intvNum = -1;
-
-            intvNum = getintvNum(pitch);
-
-            //Converting Ended
-            if(pitch < 8000) {
-                String message = String.format("Pitch detected at %d 분 %d초, %.2f: %.2fHz ( %.2f probability)",
-                        pMinute, pSecond, timeStamp, pitch,probability);
-                Log.d("test", message);
-                if(intvNum!=-1) {
-                    CalculateScore.Time.add(timeStamp);
-                    CalculateScore.Interval.add(intvNum);
-                }
+        float pitch = pitchDetectionResult.getPitch();
+        if(isRecord){
+            int read = 0;
+            read = stream.read(data, 0, BUFFER_SIZE);
+            try{
+                mBOStream.write(data, 0, read);
+            } catch (Exception e){
             }
+
         }
+        /*
+        if(pitch != -1 && pitch < 8000){
+            double timeStamp = audioEvent.getTimeStamp();
+            int intvNum = getintvNum(pitch);
+            CalculateScore.Time.add(timeStamp);
+            CalculateScore.Interval.add(intvNum);
+        }
+        */
     }
 
-    private int getintvNum(float pitch)
-    {
+    private int getintvNum(float pitch) {
         int intvNum = 0;
         if(pitch >= 127.142 && pitch < 134.702) {
             intvNum = 1;
