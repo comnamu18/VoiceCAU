@@ -42,7 +42,6 @@ import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 import static java.lang.Math.abs;
 
 public class AudioController{
-    private final String TEMP_FILE_NAME = "test_temp.bak";
     private final int HEADER_SIZE = 0x2c;
     private final int RECORDER_BPP = 16;
     private final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
@@ -78,9 +77,9 @@ public class AudioController{
         int audioBufferSize = 2048;
         String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.KOREA).format(new Date());
         //Setting Files
-        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "_" + date + ".aac");
-        waveFile = new File(Environment.getExternalStorageDirectory()+"/"+SongName + "TEST.wav");
-        tempFile = new File(Environment.getExternalStorageDirectory()+"/"+TEMP_FILE_NAME);
+        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+ SongName + "_" + date + ".aac");
+        waveFile = new File(Environment.getExternalStorageDirectory()+"/TEST.wav");
+        tempFile = new File(Environment.getExternalStorageDirectory()+"/temp.bak");
 
         try {
             mBOStream = new BufferedOutputStream(new FileOutputStream(tempFile));

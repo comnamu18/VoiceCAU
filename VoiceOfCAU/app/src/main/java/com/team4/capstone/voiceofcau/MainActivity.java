@@ -23,7 +23,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.mobile.auth.core.IdentityManager;
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
 
 public class MainActivity extends AppCompatActivity
@@ -31,6 +36,8 @@ public class MainActivity extends AppCompatActivity
     ListView listView;
     IconTextListAdapter adapter;
     SharedPreferences prefs;
+    DynamoDBMapper dynamoDBMapper;
+    String UserID;
 
     public static final int MY_RECORD_PERMISSION = 78;
     public static final int MY_SAVING_PERMISSION = 79;
@@ -53,6 +60,21 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Intent intent = getIntent();
+        UserID = intent.getStringExtra("UserID");
+        Log.d("USER ID", UserID);
+
+        // AWSMobileClient enables AWS user credentials to access your table
+        AWSMobileClient.getInstance().initialize(this).execute();
+        AWSCredentialsProvider credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
+        AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
+        // Add code to instantiate a AmazonDynamoDBClient
+        AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
+        this.dynamoDBMapper = DynamoDBMapper.builder()
+                .dynamoDBClient(dynamoDBClient)
+                .awsConfiguration(configuration)
+                .build();
 
         listView = (ListView) findViewById(R.id.songList);
         adapter = new IconTextListAdapter(this);
@@ -130,7 +152,7 @@ public class MainActivity extends AppCompatActivity
                 String[] curData=curItem.getData();
                 Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
                 // songData[2] => 1 == From main / 2 == From songscreen
-                String songData = curData[0] + "_" + curData[2] + "_1";
+                String songData = curData[0] + "_" + curData[2] + "_1_" + UserID;
                 Log.d("songData Test", songData);
                 intent.putExtra("Songname",songData);
                 startActivityForResult(intent, SUCCESS_FROM_POPUP);
@@ -215,11 +237,11 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case SUCCESS_FROM_POPUP:
-                String SongData = data.getStringExtra("SongData");
                 switch (resultCode) {
                     case RESULT_CANCEL:
                         break;
                     default :
+                        String SongData = data.getStringExtra("SongData");
                         Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
                         intent.putExtra("Songname", SongData);
                         startActivity(intent);

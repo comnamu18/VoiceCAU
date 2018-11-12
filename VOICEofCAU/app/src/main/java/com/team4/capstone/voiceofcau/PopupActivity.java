@@ -19,7 +19,6 @@ public class PopupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent data = getIntent();
-        Log.d("Intent Test", data.getStringExtra("Songname"));
         datas = data.getStringExtra("Songname").split("_");
         songName = datas[0];
         type = Integer.parseInt(datas[2]);
@@ -47,7 +46,7 @@ public class PopupActivity extends Activity {
     public void Return (View v){
         if(type == 1){
             Intent intent = new Intent();
-            String SongData = datas[0] + "_" + datas[1] + "_1";
+            String SongData = datas[0] + "_" + datas[1] + "_1_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_NORMAL, intent);
             finish();
@@ -61,7 +60,7 @@ public class PopupActivity extends Activity {
     public void Continue (View v){
         if(type == 1){
             Intent intent = new Intent();
-            String SongData = datas[0] + "_" + datas[1] + "_2";
+            String SongData = datas[0] + "_" + datas[1] + "_2_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_PRACTICE, intent);
             finish();
@@ -76,7 +75,7 @@ public class PopupActivity extends Activity {
     public void Main (View v){
         if(type == 1){
             Intent intent = new Intent();
-            String SongData = datas[0] + "_" + datas[1] + "_3";
+            String SongData = datas[0] + "_" + datas[1] + "_3_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_DUET, intent);
             finish();

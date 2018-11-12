@@ -20,10 +20,9 @@ public class SongscreenActivity extends AppCompatActivity {
     MediaController mediaController;
     VideoView videoView;
     AudioController audioController;
-
+    int type;
     boolean isRecord;
     boolean isScoring;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +37,7 @@ public class SongscreenActivity extends AppCompatActivity {
         Song = intent.getStringExtra("Songname");
         SongName = Song.split("_")[0];
         String SongPath = Song.split("_")[1];
+        type = Integer.parseInt(Song.split("_")[2]);
 
         if (isRecord){
             Button recordButton = (Button) findViewById(R.id.button2);

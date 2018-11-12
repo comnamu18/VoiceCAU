@@ -1,5 +1,6 @@
 package com.team4.capstone.voiceofcau;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -15,9 +16,11 @@ import com.amazonaws.mobile.auth.ui.SignInUI;
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 
 public class AuthenticatorActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +37,12 @@ public class AuthenticatorActivity extends AppCompatActivity {
         IdentityManager.getDefaultIdentityManager().addSignInStateChangeListener(new SignInStateChangeListener() {
             @Override
             public void onUserSignedIn() {
-                Log.d("LOG_TAG", "User Signed In");
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Context context = getApplicationContext();
+                CognitoUserPool userPool = new CognitoUserPool(context, new AWSConfiguration(context));
+                String UserID = userPool.getCurrentUser().getUserId();
+                intent.putExtra("UserID", UserID);
+                Log.d("USERID",  UserID);
                 startActivity(intent);
                 finish();
             }
@@ -46,7 +53,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 showSignIn();
             }
         });
-        showSignIn();
     }
     /*
      * Display the AWS SDK sign-in/sign-up UI
@@ -60,7 +66,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                         .fontFamily("sans-serif-light") // Apply sans-serif-light as the global font
                         .build();
 
-        Log.d("LOG_TAG", "showSignIn");
         SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
         signin.login(AuthenticatorActivity.this, MainActivity.class).authUIConfiguration(config).execute();
     }
