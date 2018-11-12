@@ -342,6 +342,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
         }
         else if(pitch >= 179.806 && pitch < 190.497) {
             intvNum=7;
+            //F3#
         }
         else if(pitch >= 190.497 && pitch < 201.825) {
             intvNum=8;
@@ -396,6 +397,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
         }
         else if(pitch >= 508.567 && pitch < 538.808) {
             intvNum=25;
+            //C5
         }
         else if(pitch >= 538.808 && pitch < 570.847) {
             intvNum=26;
