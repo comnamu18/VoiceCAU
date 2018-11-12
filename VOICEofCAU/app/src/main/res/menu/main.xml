@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/action_record"
-        android:icon="@drawable/mic_off"
+        android:icon="@android:drawable/ic_btn_speak_now"
         android:orderInCategory="100"
         android:title="record"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_sync"
-        android:icon="@drawable/pen_off"
+        android:icon="@android:drawable/ic_menu_edit"
         android:orderInCategory="100"
         android:title="sync"
         app:showAsAction="always" />

@@ -53,7 +53,7 @@ public class PopupActivity extends Activity {
             finish();
         }
         else {
-            setResult(SongscreenActivity.RESULT_BEGIN);
+            setResult(MainActivity.RESULT_BEGIN);
             finish();
         }
     }
@@ -67,7 +67,7 @@ public class PopupActivity extends Activity {
             finish();
         }
         else {
-            setResult(SongscreenActivity.RESULT_CONT);
+            setResult(MainActivity.RESULT_CONT);
             finish();
         }
     }
@@ -82,7 +82,7 @@ public class PopupActivity extends Activity {
             finish();
         }
         else {
-            setResult(SongscreenActivity.RESULT_MAIN);
+            setResult(MainActivity.RESULT_MAIN);
             finish();
         }
     }
