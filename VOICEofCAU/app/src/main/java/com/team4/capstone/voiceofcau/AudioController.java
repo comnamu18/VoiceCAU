@@ -5,6 +5,9 @@ import android.content.Context;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaFormat;
 import android.media.MediaRecorder;
 
 import android.os.Environment;
@@ -75,7 +78,7 @@ public class AudioController{
             return;
         }
         int audioBufferSize = 2048;
-        String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.KOREA).format(new Date());
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(new Date());
         //Setting Files
         finalFile = new File(Environment.getExternalStorageDirectory()+"/"+ SongName + "_" + date + ".aac");
         waveFile = new File(Environment.getExternalStorageDirectory()+"/TEST.wav");
@@ -190,6 +193,8 @@ public class AudioController{
                 mBOStream.flush();
                 mBIStream.close();
                 mBOStream.close();
+                MediaEncoder mediaEncoder = new MediaEncoder(mAudioLen);
+                mediaEncoder.encode(waveFile, finalFile);
             }catch (Exception e) {
             }
         }
