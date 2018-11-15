@@ -261,6 +261,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             IdentityManager.getDefaultIdentityManager().signOut();
         }
+        IdentityManager.getDefaultIdentityManager().signOut();
+        finish();
     }
     public boolean getRecordPermission(){
         int recordPermission = ContextCompat.checkSelfPermission(this,

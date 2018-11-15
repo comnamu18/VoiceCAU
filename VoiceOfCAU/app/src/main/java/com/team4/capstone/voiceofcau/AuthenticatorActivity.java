@@ -53,6 +53,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 showSignIn();
             }
         });
+        showSignIn();
     }
     /*
      * Display the AWS SDK sign-in/sign-up UI
@@ -67,6 +68,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                         .build();
 
         SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-        signin.login(AuthenticatorActivity.this, MainActivity.class).authUIConfiguration(config).execute();
+        signin.login(AuthenticatorActivity.this, AuthenticatorActivity.class).authUIConfiguration(config).execute();
     }
 }
