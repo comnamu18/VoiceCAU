@@ -7,10 +7,7 @@ public class IconTextItem {
     //private란 변경이 되면 안 되는 변수에 대해 접근 제한 자 설정
     private Drawable mIcon;
     private String[] mData;
-
     private boolean mSelectable = true;
-
-
     //파라메타값이 배열로된것을 사용함
     public IconTextItem(Drawable icon, String[] obj){
         mIcon = icon;
@@ -22,7 +19,6 @@ public class IconTextItem {
     //위와 이거와 동일한 기능을 하지만 위의 방법을 쓰는 게 좀 더 간단하고 좋아 보임
     public IconTextItem(Drawable icon, String obj01, String obj02, String obj03) {
         mIcon = icon;
-
         mData = new String[3];
         mData[0] = obj01;
         mData[1] = obj02;

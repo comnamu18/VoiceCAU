@@ -88,7 +88,6 @@ public class SongscreenActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
             videoView.pause();
-            //데이터 담아서 팝업(액티비티) 호출
             Intent intent = new Intent(this, PopupActivity.class);
             intent.putExtra("Songname", Song);
             startActivityForResult(intent,MainActivity.SUCCESS_FROM_POPUP);

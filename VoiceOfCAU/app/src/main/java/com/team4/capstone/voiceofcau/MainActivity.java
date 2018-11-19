@@ -156,9 +156,7 @@ public class MainActivity extends AppCompatActivity
                 IconTextItem curItem = (IconTextItem) adapter.getItem(position);
                 String[] curData=curItem.getData();
                 Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
-                // songData[2] => 1 == From main / 2 == From songscreen
                 String songData = curData[0] + "_" + curData[2] + "_1_" + UserID;
-                Log.d("songData Test", songData);
                 intent.putExtra("Songname",songData);
                 startActivityForResult(intent, SUCCESS_FROM_POPUP);
             }
@@ -261,6 +259,10 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SUCCESS_FROM_SEARCH:
                 //찾은 노래 실행
+                Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
+                String getData = data.getStringExtra("Songname");
+                intent.putExtra("Songname",getData + UserID);
+                startActivityForResult(intent, SUCCESS_FROM_POPUP);
                 break;
             case SUCCESS_FROM_DUET:
                 switch (resultCode) {
