@@ -246,7 +246,6 @@ public class MainActivity extends AppCompatActivity
                     case RESULT_DUET:
                         String SongData1 = data.getStringExtra("SongData");
                         Intent intent1 = new Intent(getApplicationContext(), PopupActivity.class);
-                        Log.d("songData Test", SongData1);
                         intent1.putExtra("Songname", SongData1);
                         startActivityForResult(intent1, SUCCESS_FROM_DUET);
                         break;

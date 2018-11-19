@@ -29,7 +29,7 @@ public class PopupActivity extends Activity {
 
         //UI 객체생성
         txtText = (TextView)findViewById(R.id.popupText);
-        if (type == 1){
+        if (type < 3){
             txtText.setText(songName);
             Button button = (Button)findViewById(R.id.popup_button1);
             button.setText(R.string.popup_button11);
@@ -37,9 +37,6 @@ public class PopupActivity extends Activity {
             button.setText(R.string.popup_button21);
             button = (Button)findViewById(R.id.popup_button3);
             button.setText(R.string.popup_button31);
-        }
-        else if(type==2){
-            txtText.setText(R.string.popup_notice);
         }
         else if(type == 3){
             txtText.setText(songName);
@@ -50,11 +47,14 @@ public class PopupActivity extends Activity {
             button = (Button)findViewById(R.id.popup_button3);
             button.setVisibility(View.GONE);
         }
+        else {
+            txtText.setText(R.string.popup_notice);
+        }
 
     }
     //돌아가기 or 일반모드
     public void Return (View v){
-        if(type == 1){
+        if(type < 3){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_1_" + datas[3];
             intent.putExtra("SongData", SongData);
@@ -63,13 +63,12 @@ public class PopupActivity extends Activity {
         }
         else if(type == 3){
             Intent intent = new Intent();
-            String SongData = datas[0] + "_" + datas[1] + "_9_" + datas[3];
+            String SongData = datas[0] + "_" + datas[1] + "_6_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_PART_A, intent);
 
             finish();
         }
-
         else {
             setResult(MainActivity.RESULT_BEGIN);
             finish();
@@ -77,7 +76,7 @@ public class PopupActivity extends Activity {
     }
     //계속하기 or 연습모드
     public void Continue (View v){
-        if(type == 1){
+        if(type < 1){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_2_" + datas[3];
             intent.putExtra("SongData", SongData);
@@ -86,7 +85,7 @@ public class PopupActivity extends Activity {
         }
         else if(type == 3){
             Intent intent = new Intent();
-            String SongData = datas[0] + "_" + datas[1] + "_8_" + datas[3];
+            String SongData = datas[0] + "_" + datas[1] + "_7_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_PART_B, intent);
             finish();
@@ -99,14 +98,13 @@ public class PopupActivity extends Activity {
 
     //메인 메뉴로 돌아가기 or 듀엣모드
     public void Main (View v){
-        if(type == 1){
+        if(type < 4){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_3_" + datas[3];
             intent.putExtra("SongData", SongData);
             setResult(MainActivity.RESULT_DUET, intent);
             finish();
         }
-
         else {
             setResult(MainActivity.RESULT_MAIN);
             finish();
@@ -116,7 +114,7 @@ public class PopupActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(type == 1){
+        if(type < 4){
             setResult(MainActivity.RESULT_CANCEL);
             finish();
         }
@@ -129,7 +127,7 @@ public class PopupActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if(type == 1){
+        if(type < 4){
             setResult(MainActivity.RESULT_CANCEL);
             finish();
         }

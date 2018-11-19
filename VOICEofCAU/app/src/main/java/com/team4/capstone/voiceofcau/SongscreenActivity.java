@@ -35,10 +35,27 @@ public class SongscreenActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Song = intent.getStringExtra("Songname");
-        SongName = Song.split("_")[0];
-        String SongPath = Song.split("_")[1];
-        type = Integer.parseInt(Song.split("_")[2]);
-
+        String[] datas = Song.split("_");
+        SongName = datas[0];
+        String SongPath = datas[1];
+        type = Integer.parseInt(datas[2]);
+        switch (type){
+            case 1:
+                Song = SongName + "_" + SongPath + "_4_" + datas[3];
+                break;
+            case 3:
+                Song = SongName + "_" + SongPath + "_8_" + datas[3];
+                break;
+                default:
+                    Song = SongName + "_" + SongPath + "_" + datas[2] + "_" + datas[3];
+                    break;
+        }
+        if(type != 4) {
+            isScoring = false;
+        }
+        if(type == 8) {
+            isRecord = false;
+        }
         if (isRecord){
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
@@ -66,23 +83,6 @@ public class SongscreenActivity extends AppCompatActivity {
                 finish();
             }
         });
-        class StopTask extends TimerTask {
-            private String SongName;
-            private int type; // type 1 is Audio(BackGround or Singer), 2 is Media(User)
-            public StopTask(String SongName, int type){
-                this.SongName = SongName;
-                this.type = type;
-            }
-            @Override
-            public void run() {
-                if (type == 1) {
-                    //Audio 소리 0
-                }
-                else{
-
-                }
-            }
-        }
     }
 
     @Override
@@ -90,6 +90,7 @@ public class SongscreenActivity extends AppCompatActivity {
             videoView.pause();
             //데이터 담아서 팝업(액티비티) 호출
             Intent intent = new Intent(this, PopupActivity.class);
+            intent.putExtra("Songname", Song);
             startActivityForResult(intent,MainActivity.SUCCESS_FROM_POPUP);
     }
 
