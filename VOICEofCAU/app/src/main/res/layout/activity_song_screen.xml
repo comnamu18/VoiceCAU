@@ -18,6 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
+
     <VideoView
         android:id="@+id/videoView"
         android:layout_width="382dp"
