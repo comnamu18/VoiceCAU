@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +30,10 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.mobileconnectors.s3.transferutility.*;
+import com.amazonaws.services.s3.AmazonS3Client;
+
+import java.io.File;
 
 
 public class MainActivity extends AppCompatActivity
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences prefs;
     DynamoDBMapper dynamoDBMapper;
     String UserID;
-
+    boolean isDownloadEnd = false;
 
     public static final int MY_RECORD_PERMISSION = 78;
     public static final int MY_SAVING_PERMISSION = 79;
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity
                 .dynamoDBClient(dynamoDBClient)
                 .awsConfiguration(configuration)
                 .build();
+
 
         listView = (ListView) findViewById(R.id.songList);
         adapter = new IconTextListAdapter(this);
@@ -185,42 +191,40 @@ public class MainActivity extends AppCompatActivity
                             case R.id.action_record:
                                 if (!prefs.contains("isRecord")) {
                                     ed.putBoolean("isRecord", false);
-                                } else {
-                                    if(!getRecordPermission()){
-                                        Toast.makeText(getApplicationContext(), "Record need MIC Permissions", Toast.LENGTH_LONG).show();
-                                        break;
-                                    }
-                                    boolean isRecord = !prefs.getBoolean("isRecord", true);
-                                    if (isRecord) {
-                                        item.setTitle("record On");
-                                        Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        item.setTitle("record Off");
-                                        Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
-                                    }
-                                    ed.putBoolean("isRecord", isRecord);
-                                    ed.commit();
                                 }
+                                if(!getRecordPermission()){
+                                    Toast.makeText(getApplicationContext(), "Record need MIC Permissions", Toast.LENGTH_LONG).show();
+                                    break;
+                                }
+                                boolean isRecord = !prefs.getBoolean("isRecord", true);
+                                if (isRecord) {
+                                    item.setTitle("record On");
+                                    Toast.makeText(getApplicationContext(), "Record On", Toast.LENGTH_LONG).show();
+                                } else {
+                                    item.setTitle("record Off");
+                                    Toast.makeText(getApplicationContext(), "Record Off", Toast.LENGTH_LONG).show();
+                                }
+                                ed.putBoolean("isRecord", isRecord);
+                                ed.commit();
                                 break;
                             case R.id.action_sync:
                                 if (!prefs.contains("isScoring")) {
                                     ed.putBoolean("isScoring", false);
-                                } else {
-                                    if(!getSavingPermission()){
-                                        Toast.makeText(getApplicationContext(), "Scoring need MIC and SAVE Permissions", Toast.LENGTH_LONG).show();
-                                        break;
-                                    }
-                                    boolean isScoring = !prefs.getBoolean("isScoring", true);
-                                    if (isScoring) {
-                                        item.setTitle("Scoring On");
-                                        Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        item.setTitle("Scoring Off");
-                                        Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
-                                    }
-                                    ed.putBoolean("isScoring", isScoring);
-                                    ed.commit();
                                 }
+                                if(!getSavingPermission()){
+                                    Toast.makeText(getApplicationContext(), "Scoring need MIC and SAVE Permissions", Toast.LENGTH_LONG).show();
+                                    break;
+                                }
+                                boolean isScoring = !prefs.getBoolean("isScoring", true);
+                                if (isScoring) {
+                                    item.setTitle("Scoring On");
+                                    Toast.makeText(getApplicationContext(), "Scoring On", Toast.LENGTH_LONG).show();
+                                } else {
+                                    item.setTitle("Scoring Off");
+                                    Toast.makeText(getApplicationContext(), "Scoring Off", Toast.LENGTH_LONG).show();
+                                }
+                                ed.putBoolean("isScoring", isScoring);
+                                ed.commit();
                                 break;
                             case R.id.action_search:
                                 intent = new Intent(getApplicationContext(), SearchActivity.class);
@@ -236,12 +240,50 @@ public class MainActivity extends AppCompatActivity
                 });
 
     }
+    private void downloadWithTransferUtility() {
+
+        TransferUtility transferUtility =
+                TransferUtility.builder()
+                        .context(getApplicationContext())
+                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
+                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
+                        .build();
+
+        TransferObserver downloadObserver =
+                transferUtility.download(
+                        "mywaypr.mp4",
+                        new File(Environment.getExternalStorageDirectory()+"/TES3.mp4"));
+
+        // Attach a listener to the observer to get state update and progress notifications
+        downloadObserver.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                if (TransferState.COMPLETED == state) {
+                    isDownloadEnd = true;
+                }
+            }
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
+                int percentDone = (int)percentDonef;
+                Log.d("File Transfer", "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
+            }
+            @Override
+            public void onError(int id, Exception ex) {
+                // Handle errors
+            }
+        });
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case SUCCESS_FROM_POPUP:
                 switch (resultCode) {
                     case RESULT_DUET:
+                        downloadWithTransferUtility();
+                        while(!isDownloadEnd){
+
+                        }
                         String SongData1 = data.getStringExtra("SongData");
                         Intent intent1 = new Intent(getApplicationContext(), PopupActivity.class);
                         intent1.putExtra("Songname", SongData1);
@@ -259,10 +301,12 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SUCCESS_FROM_SEARCH:
                 //찾은 노래 실행
-                Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
-                String getData = data.getStringExtra("Songname");
-                intent.putExtra("Songname",getData + UserID);
-                startActivityForResult(intent, SUCCESS_FROM_POPUP);
+                if (resultCode != RESULT_CANCEL){
+                    Intent intent = new Intent(getApplicationContext(), PopupActivity.class);
+                    String getData = data.getStringExtra("Songname");
+                    intent.putExtra("Songname",getData + UserID);
+                    startActivityForResult(intent, SUCCESS_FROM_POPUP);
+                }
                 break;
             case SUCCESS_FROM_DUET:
                 switch (resultCode) {

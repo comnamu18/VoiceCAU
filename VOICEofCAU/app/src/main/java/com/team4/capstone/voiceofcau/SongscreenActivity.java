@@ -50,18 +50,19 @@ public class SongscreenActivity extends AppCompatActivity {
                     Song = SongName + "_" + SongPath + "_" + datas[2] + "_" + datas[3];
                     break;
         }
+        /*
         if(type != 4) {
             isScoring = false;
         }
         if(type == 8) {
             isRecord = false;
-        }
+        }*/
         if (isRecord){
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
         audioController = new AudioController(
-                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
+                getApplicationContext(), SongPath, SongName, true, false);
 
         videoView = (VideoView) findViewById(R.id.videoView);
         mediaController = new MediaController(this);

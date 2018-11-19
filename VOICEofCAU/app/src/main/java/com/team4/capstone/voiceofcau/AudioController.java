@@ -80,13 +80,15 @@ public class AudioController{
         int audioBufferSize = 2048;
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(new Date());
         //Setting Files
-        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+ SongName + "_" + date + ".aac");
+        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+ filePath + "_" + date + ".aac");
+        Log.d("final", finalFile.toString());
         waveFile = new File(Environment.getExternalStorageDirectory()+"/TEST.wav");
         tempFile = new File(Environment.getExternalStorageDirectory()+"/temp.bak");
 
         try {
             mBOStream = new BufferedOutputStream(new FileOutputStream(tempFile));
         } catch (FileNotFoundException e1) {
+            Log.d("testing", "mBOS CreateFail");
             e1.printStackTrace();
         }
 
@@ -102,7 +104,7 @@ public class AudioController{
                 RECORDER_SAMPLERATE, audioBufferSize, myPitchDetector);
         dispatcher.addAudioProcessor(audioProcessor);
         stream.startRecording();
-        if(isScoring || isRecord){
+        if(this.isScoring || this.isRecord){
             scoreThread = new Thread(dispatcher, "Dispatcher");
             scoreThread.start();
         }
@@ -119,6 +121,7 @@ public class AudioController{
             if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) { // 성공?
                 buffer = new byte[sizeInBytes]; // byte[] 버퍼 생성
                 RECORDER_SAMPLERATE = sampleRate;
+                Log.d("SampleRate", String.valueOf(sampleRate));
                 return audioRecord;
             } else {
                 audioRecord.release(); // 실패했으니 릴리즈.
@@ -193,9 +196,11 @@ public class AudioController{
                 mBOStream.flush();
                 mBIStream.close();
                 mBOStream.close();
+                /*
                 MediaEncoder mediaEncoder = new MediaEncoder(mAudioLen);
-                mediaEncoder.encode(waveFile, finalFile);
+                mediaEncoder.encode(waveFile, finalFile);*/
             }catch (Exception e) {
+                Log.d("testing", "mBOS CreateFail");
             }
         }
         if(isScoring || isRecord){
@@ -233,6 +238,7 @@ public class AudioController{
             }
             reader.close();
         } catch (Exception e) {
+
             e.printStackTrace();
         }
         //calculate Total time on the scorecard
@@ -311,6 +317,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
             try{
                 mBOStream.write(data, 0, BUFFER_SIZE);
             } catch (Exception e){
+                Log.d("testing", "mBOS Write Fail");
             }
 
         }

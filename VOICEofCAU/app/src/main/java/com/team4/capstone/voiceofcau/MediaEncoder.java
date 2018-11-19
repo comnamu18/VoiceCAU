@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 
 public class MediaEncoder {
 
+
     private static final String TAG = MediaEncoder.class.getSimpleName();
 
     private static final long QUEUE_TIMEOUT = 4096;
