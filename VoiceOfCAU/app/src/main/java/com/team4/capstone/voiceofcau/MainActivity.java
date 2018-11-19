@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     DynamoDBMapper dynamoDBMapper;
     String UserID;
 
+
     public static final int MY_RECORD_PERMISSION = 78;
     public static final int MY_SAVING_PERMISSION = 79;
     public static final int RESULT_NORMAL = 55;
@@ -47,9 +48,13 @@ public class MainActivity extends AppCompatActivity
     public static final int RESULT_CANCEL = -1;
     public static final int SUCCESS_FROM_POPUP = 1;
     public static final int SUCCESS_FROM_SEARCH = 2;
+    public static final int SUCCESS_FROM_DUET = 3;
     public static final int RESULT_MAIN = 45;
     public static final int RESULT_CONT = 44;
     public static final int RESULT_BEGIN = 43;
+    public static final int RESULT_PART_A = 9;
+    public static final int RESULT_PART_B = 8;
+
 
     boolean isReocrdPermission = false;
     boolean isSavingPermission = false;
@@ -238,6 +243,13 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case SUCCESS_FROM_POPUP:
                 switch (resultCode) {
+                    case RESULT_DUET:
+                        String SongData1 = data.getStringExtra("SongData");
+                        Intent intent1 = new Intent(getApplicationContext(), PopupActivity.class);
+                        Log.d("songData Test", SongData1);
+                        intent1.putExtra("Songname", SongData1);
+                        startActivityForResult(intent1, SUCCESS_FROM_DUET);
+                        break;
                     case RESULT_CANCEL:
                         break;
                     default :
@@ -250,6 +262,16 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SUCCESS_FROM_SEARCH:
                 //찾은 노래 실행
+                break;
+            case SUCCESS_FROM_DUET:
+                switch (resultCode) {
+                    case RESULT_PART_A:
+                        Toast.makeText(getApplicationContext(), "PART_A", Toast.LENGTH_LONG).show();
+                        break;
+                    case RESULT_PART_B:
+                        Toast.makeText(getApplicationContext(), "PART_B", Toast.LENGTH_LONG).show();
+                        break;
+                }
                 break;
         }
     }
