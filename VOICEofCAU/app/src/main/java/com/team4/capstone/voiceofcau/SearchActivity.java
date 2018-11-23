@@ -72,7 +72,12 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
-
+    @Override
+    public void onBackPressed() {
+        setResult(MainActivity.RESULT_CANCEL);
+        finish();
+        return;
+    }
 }
 
 

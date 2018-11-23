@@ -6,22 +6,17 @@
         android:id="@+id/action_record"
         android:icon="@android:drawable/ic_btn_speak_now"
         android:orderInCategory="100"
-        android:title="record"
+        android:title="Record"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_sync"
         android:icon="@android:drawable/ic_menu_edit"
         android:orderInCategory="100"
-        android:title="sync"
+        android:title="Scoring"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_menu_search"
-        android:orderInCategory="100"
-        android:title="search"
-        app:showAsAction="always" />
+
     <item
         android:id="@+id/action_stat"
         android:icon="@android:drawable/ic_menu_save"

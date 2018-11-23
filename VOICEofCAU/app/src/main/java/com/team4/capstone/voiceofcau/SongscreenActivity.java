@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.util.TimerTask;
@@ -50,6 +51,10 @@ public class SongscreenActivity extends AppCompatActivity {
                     Song = SongName + "_" + SongPath + "_" + datas[2] + "_" + datas[3];
                     break;
         }
+
+
+        TextView textView=(TextView)findViewById(R.id.song_name);
+        textView.setText(SongName);
         /*
         if(type != 4) {
             isScoring = false;

@@ -226,10 +226,7 @@ public class MainActivity extends AppCompatActivity
                                 ed.putBoolean("isScoring", isScoring);
                                 ed.commit();
                                 break;
-                            case R.id.action_search:
-                                intent = new Intent(getApplicationContext(), SearchActivity.class);
-                                startActivityForResult(intent, SUCCESS_FROM_SEARCH);
-                                break;
+
                             case R.id.action_stat:
                                 intent = new Intent(getApplicationContext(), StatisticActivity.class);
                                 startActivity(intent);
@@ -240,6 +237,32 @@ public class MainActivity extends AppCompatActivity
                 });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu);
+        return true;
+    }
+
+    //액션버튼을 클릭했을때의 동작
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        //or switch문을 이용하면 될듯 하다.
+
+        if (id == R.id.action_search) {
+            Intent intent1;
+                intent1 = new Intent(getApplicationContext(), SearchActivity.class);
+                startActivityForResult(intent1, SUCCESS_FROM_SEARCH);
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
     private void downloadWithTransferUtility() {
 
         TransferUtility transferUtility =
