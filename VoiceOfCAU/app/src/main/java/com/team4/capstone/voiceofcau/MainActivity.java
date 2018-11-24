@@ -228,6 +228,14 @@ public class MainActivity extends AppCompatActivity
                                 break;
 
                             case R.id.action_stat:
+                                String root = Environment.getExternalStorageDirectory().toString();
+                                String audio = root + "/sample.m4a";
+                                String video = root + "/everytime.mp4";
+                                String output = root + "/ouput.mp4";
+                                String testF = root + "/test.wav";
+                                Log.e("FILE", "audio:"+audio + " video:"+video+ " out:"+output);
+                                TestOverLay test = new TestOverLay(testF);
+                                test.mux(video, audio, output);
                                 intent = new Intent(getApplicationContext(), StatisticActivity.class);
                                 intent.putExtra("USERID", UserID);
                                 startActivity(intent);
@@ -255,59 +263,18 @@ public class MainActivity extends AppCompatActivity
             Intent intent1;
                 intent1 = new Intent(getApplicationContext(), SearchActivity.class);
                 startActivityForResult(intent1, SUCCESS_FROM_SEARCH);
-
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    private void downloadWithTransferUtility() {
-
-        TransferUtility transferUtility =
-                TransferUtility.builder()
-                        .context(getApplicationContext())
-                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
-                        .build();
-
-        TransferObserver downloadObserver =
-                transferUtility.download(
-                        "mywaypr.mp4",
-                        new File(Environment.getExternalStorageDirectory()+"/TES3.mp4"));
-
-        // Attach a listener to the observer to get state update and progress notifications
-        downloadObserver.setTransferListener(new TransferListener() {
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-                if (TransferState.COMPLETED == state) {
-                    isDownloadEnd = true;
-                }
-            }
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
-                int percentDone = (int)percentDonef;
-                Log.d("File Transfer", "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
-            }
-            @Override
-            public void onError(int id, Exception ex) {
-                // Handle errors
-            }
-        });
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case SUCCESS_FROM_POPUP:
                 switch (resultCode) {
                     case RESULT_DUET:
-                        downloadWithTransferUtility();
-                        while(!isDownloadEnd){
-
-                        }
                         String SongData1 = data.getStringExtra("SongData");
                         Intent intent1 = new Intent(getApplicationContext(), PopupActivity.class);
                         intent1.putExtra("Songname", SongData1);

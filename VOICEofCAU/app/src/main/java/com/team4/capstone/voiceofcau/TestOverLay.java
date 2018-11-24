@@ -144,10 +144,7 @@ public class TestOverLay {
         convert.run();
     }
 
-    public boolean muxer(String videoFile, String outputFile) {
-        outputFile = "/storage/emulated/0/sample.m4a";
-        while(!isConverted){
-        }
+    public boolean mux(String videoFile, String audioFile, String outputFile) {
         Movie video;
         try {
             video = new MovieCreator().build(videoFile);
@@ -161,7 +158,7 @@ public class TestOverLay {
 
         Movie audio;
         try {
-            audio = new MovieCreator().build(outputFile);
+            audio = new MovieCreator().build(audioFile);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

@@ -68,12 +68,6 @@ public class ScoreActivity extends AppCompatActivity {
         Button btn2 = (Button)findViewById(R.id.score_detailbutton);
         btn2.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                String audio = "/storage/emulated/0/TEST.wav";
-                String video = "/storage/emulated/0/everytime.mp4";
-                String output = "/storage/emulated/0/ouput.mp4";
-                Log.e("FILE", "audio:"+audio + " video:"+video+ " out:"+output);
-                TestOverLay test = new TestOverLay(audio);
-                test.muxer(video, output);
                 Intent intent = new Intent(getApplicationContext(), Detail_scoreActivity.class);
                 startActivity(intent);
                 finish();
