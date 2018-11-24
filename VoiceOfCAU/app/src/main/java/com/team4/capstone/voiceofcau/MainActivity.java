@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity
 
                             case R.id.action_stat:
                                 intent = new Intent(getApplicationContext(), StatisticActivity.class);
+                                intent.putExtra("USERID", UserID);
                                 startActivity(intent);
                                 break;
                         }
