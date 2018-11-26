@@ -38,6 +38,7 @@ public class ListViewAdapter extends BaseAdapter implements Filterable {
         ImageView iconImageView = (ImageView) convertView.findViewById(R.id.iconItem) ;
         TextView titleTextView = (TextView) convertView.findViewById(R.id.dataItem01) ;
         TextView descTextView = (TextView) convertView.findViewById(R.id.dataItem02) ;
+
         // Data Set(filteredItemList)에서 position에 위치한 데이터 참조 획득
         ListViewItem listViewItem = filteredItemList.get(position);
         // 아이템 내 각 위젯에 데이터 반영
