@@ -93,6 +93,27 @@ public class AudioController{
         }
 
         BUFFER_SIZE = 4096;
+
+        StringTokenizer myTokens;
+
+        try {
+            String scoreCSV = filePath + "score26.csv";
+            InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
+            BufferedReader reader = new BufferedReader(is);
+            String str2;
+            while ((str2 = reader.readLine()) != null) {
+                myTokens = new StringTokenizer(str2, ",");
+                singer.singtitle.add(myTokens.nextToken());
+                singer.singerStartTime.add(Double.parseDouble(myTokens.nextToken()));
+                singer.singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
+                singer.singerInterval.add(Integer.parseInt(myTokens.nextToken()));
+            }
+            reader.close();
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
         stream = createAudioRecord();
 
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
@@ -216,35 +237,12 @@ public class AudioController{
         double score = 0;
         double totalTime = 0;
 
-        ArrayList<String> singtitle = new ArrayList<>();
-        ArrayList<Double> singerStartTime = new ArrayList<>();
-        ArrayList<Double> singerEndTime = new ArrayList<>();
-        ArrayList<Integer> singerSubInterval1 = new ArrayList<>();
-        ArrayList<Integer> singerSubInterval2 = new ArrayList<>();
-        StringTokenizer myTokens;
 
-        try {
-            String scoreCSV = filePath + "score.csv";
-            InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
-            BufferedReader reader = new BufferedReader(is);
-            String str2;
-            while ((str2 = reader.readLine()) != null) {
-                myTokens = new StringTokenizer(str2, ",");
-                singtitle.add(myTokens.nextToken());
-                singerStartTime.add(Double.parseDouble(myTokens.nextToken()));
-                singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
-                singerSubInterval1.add(Integer.parseInt(myTokens.nextToken()));
-                singerSubInterval2.add(Integer.parseInt(myTokens.nextToken()));
-            }
-            reader.close();
-        } catch (Exception e) {
 
-            e.printStackTrace();
-        }
         //calculate Total time on the scorecard
-        for(int i = 0; i < singerStartTime.size(); i++)
+        for(int i = 0; i < singer.singerStartTime.size(); i++)
         {
-            totalTime = totalTime +  (singerEndTime.get(i) - singerStartTime.get(i));
+            totalTime = totalTime +  (singer.singerEndTime.get(i) - singer.singerStartTime.get(i));
             String message = String.format("Total Time = %f", totalTime);
             Log.d("Total time", message);
         }
@@ -252,19 +250,19 @@ public class AudioController{
         //Scoring
         int i = 0;
         int j = 0;
-        while(j < singerStartTime.size() && i < CalculateScore.Time.size()) {
-            if (CalculateScore.Time.get(i) > (singerStartTime.get(j)) && CalculateScore.Time.get(i) < (singerEndTime.get(j))) {
+        while(j < singer.singerStartTime.size() && i < CalculateScore.Time.size()) {
+            if (CalculateScore.Time.get(i) > (singer.singerStartTime.get(j)) && CalculateScore.Time.get(i) < (singer.singerEndTime.get(j))) {
                 //시간은 맞을 때
-                if(CalculateScore.Interval.get(i) == singerSubInterval1.get(j) || CalculateScore.Interval.get(i) == singerSubInterval2.get(j)) {
-                    score += ((singerEndTime.get(j) - singerStartTime.get(j)) / totalTime)*100;
+                if(CalculateScore.Interval.get(i) == singer.singerInterval.get(j)) {
+                    score += ((singer.singerEndTime.get(j) - singer.singerStartTime.get(j)) / totalTime)*100;
                     String message = String.format("case 1 Score = %f, CalculateScoreTime : %f, CalculateScoreInterval : %d , i: %d, j: %d",
                             score, CalculateScore.Time.get(i), CalculateScore.Interval.get(i), i, j);
                     Log.d("test1", message);
                     i++;
                     j++;
                 }
-                else if((singerSubInterval1.get(j) == singerSubInterval2.get(j)) && (abs(CalculateScore.Interval.get(i) - singerSubInterval1.get(j)) == 1)){
-                    score += ((singerEndTime.get(j) - singerStartTime.get(j)) / totalTime) * 50;
+                else if(abs(CalculateScore.Interval.get(i) - singer.singerInterval.get(j)) == 1){
+                    score += ((singer.singerEndTime.get(j) - singer.singerStartTime.get(j)) / totalTime) * 50;
                     i++;
                     j++;
                 }
@@ -277,13 +275,13 @@ public class AudioController{
             }
             //입력시간이 채점표시간을 뛰어넘었을 때
 
-            else if(CalculateScore.Time.get(i) > singerEndTime.get(j)) {
+            else if(CalculateScore.Time.get(i) > singer.singerEndTime.get(j)) {
                 String message = String.format("case 3 Score = %f : Time X (over), %d, %d", score, i, j);
                 Log.d("test3", message);
                 j++;
             }
             //입력시간이 채점표 시간보다 작을때
-            else if(CalculateScore.Time.get(i) < singerStartTime.get(j)){
+            else if(CalculateScore.Time.get(i) < singer.singerStartTime.get(j)){
                 String message = String.format("case 4 Score = %f : Time X (low), %d, %d", score, i, j);
                 Log.d("test4", message);
                 i++;
@@ -431,4 +429,9 @@ class CalculateScore {
     public static ArrayList<Integer> Interval = new ArrayList<>();
 }
 
-
+class singer {
+    public static ArrayList<String> singtitle = new ArrayList<>();
+    public static ArrayList<Double> singerStartTime = new ArrayList<>();
+    public static ArrayList<Double> singerEndTime = new ArrayList<>();
+    public static ArrayList<Integer> singerInterval = new ArrayList<>();
+}
