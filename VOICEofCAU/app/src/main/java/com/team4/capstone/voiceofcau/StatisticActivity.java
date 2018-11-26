@@ -110,7 +110,7 @@ public class StatisticActivity extends AppCompatActivity {
 
                 Gson gson = new Gson();
                 StringBuilder stringBuilder = new StringBuilder();
-
+                //test
                 // Loop through query results
                 for (int i = 0; i < result.size(); i++) {
                     String jsonFormOfItem = gson.toJson(result.get(i));
