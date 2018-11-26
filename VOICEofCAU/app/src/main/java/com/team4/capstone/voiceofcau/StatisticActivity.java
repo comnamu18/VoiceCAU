@@ -27,24 +27,33 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 
 public class StatisticActivity extends AppCompatActivity {
     DynamoDBMapper dynamoDBMapper;
     AWSCredentialsProvider credentialsProvider;
     String UserID;
+    boolean sema = false;
     ListView listview ;
     StatisticAdapter adapter;
-
-
+    ArrayList<String[]>  datas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         UserID = getIntent().getStringExtra("USERID");
-
+        datas = new ArrayList<String[]>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistic);
-
-
+        credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
+        AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
+        // Add code to instantiate a AmazonDynamoDBClient
+        AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
+        dynamoDBClient.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+        this.dynamoDBMapper = DynamoDBMapper.builder()
+                .dynamoDBClient(dynamoDBClient)
+                .awsConfiguration(configuration)
+                .build();
 
         // Adapter 생성
         adapter = new StatisticAdapter() ;
@@ -52,11 +61,24 @@ public class StatisticActivity extends AppCompatActivity {
         // 리스트뷰 참조 및 Adapter달기
         listview = (ListView) findViewById(R.id.listview2);
         listview.setAdapter(adapter);
-
-        adapter.addItem("date", "score", "songname", "userid") ;
-        adapter.addItem("asdsssf", "qwssser", "zxcvzxcvss", "qwssser") ;
         getScoreStat();
 
+        while (!sema){{
+        }}
+        Log.d("Out", String.valueOf(datas.size()));
+        for(int i = 0; i < datas.size(); i++) {
+            String[] datas1 = datas.get(i);
+            String date = new String(datas1[3]);
+            String score = new String(datas1[7]);
+            String songname = new String(datas1[11]);
+            String userid = new String(datas1[15]);
+
+            Log.d("date result: ", date);
+            Log.d("score result: ", score);
+            Log.d("songname result: ", songname );
+            Log.d("userid result: ", userid );
+            adapter.addItem(userid, songname, score, date) ;
+        }
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -71,25 +93,6 @@ public class StatisticActivity extends AppCompatActivity {
 
             }
         }) ;
-
-
-
-
-
-
-        credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
-        AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
-        // Add code to instantiate a AmazonDynamoDBClient
-        AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
-        dynamoDBClient.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
-        this.dynamoDBMapper = DynamoDBMapper.builder()
-                .dynamoDBClient(dynamoDBClient)
-                .awsConfiguration(configuration)
-                .build();
-
-        Log.d("STAT", "STARTING");
-        getScoreStat();
-
     }
 
     public void getScoreStat() {
@@ -111,21 +114,11 @@ public class StatisticActivity extends AppCompatActivity {
                 // Loop through query results
                 for (int i = 0; i < result.size(); i++) {
                     String jsonFormOfItem = gson.toJson(result.get(i));
-
-                    String[] datas1 = jsonFormOfItem.split("\"");
-                    String date = datas1[3];
-                    String score = datas1[7];
-                    String songname = datas1[11];
-                    String userid = datas1[15];
-                    adapter.addItem(date, score, songname, userid) ;
-
-
-                    stringBuilder.append(jsonFormOfItem + "\n\n");
-                    Log.d("date result: ", date.toString());
-                    Log.d("score result: ", score.toString());
-                    Log.d("songname result: ", songname.toString());
-                    Log.d("userid result: ", userid.toString());
-
+                    Log.d("TESTJSON", jsonFormOfItem);
+                    String[] a = jsonFormOfItem.split("\"");
+                    Log.d("TESTJSON", a[3]);
+                    datas.add(jsonFormOfItem.split("\""));
+                    Log.d("datasLenght", String.valueOf(datas.size()));
                 }
 
                 // Add your code here to deal with the data result
@@ -134,6 +127,7 @@ public class StatisticActivity extends AppCompatActivity {
                 if (result.isEmpty()) {
                     // There were no items matching your query.
                 }
+                sema = true;
             }
         }).start();
     }
