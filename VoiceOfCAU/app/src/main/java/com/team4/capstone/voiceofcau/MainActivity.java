@@ -228,6 +228,7 @@ public class MainActivity extends AppCompatActivity
                                 break;
 
                             case R.id.action_stat:
+                                /*
                                 String root = Environment.getExternalStorageDirectory().toString();
                                 String audio = root + "/sample.m4a";
                                 String video = root + "/everytime.mp4";
@@ -236,6 +237,7 @@ public class MainActivity extends AppCompatActivity
                                 Log.e("FILE", "audio:"+audio + " video:"+video+ " out:"+output);
                                 TestOverLay test = new TestOverLay(testF);
                                 test.mux(video, audio, output);
+                                */
                                 intent = new Intent(getApplicationContext(), StatisticActivity.class);
                                 intent.putExtra("USERID", UserID);
                                 startActivity(intent);

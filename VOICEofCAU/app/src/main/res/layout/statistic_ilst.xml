@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="50dp"
-        android:id="@+id/listview2"/>
-
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="65dp"
         android:background="#ffffff">
 
 
@@ -25,53 +17,52 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="UserId"
-            android:id="@+id/dstatisticTitle01"
+            android:text="Large Text"
+            android:id="@+id/dataItem01"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#FF4081"
-            android:textSize="17dp"/>
+            android:textColor="#000000"
+            android:textSize="16dp"/>
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="SongName"
-            android:id="@+id/statisticTitle02"
+            android:text="Large Text"
+            android:id="@+id/dataItem02"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#FF4081"
-            android:textSize="17dp"/>
+            android:textColor="#000000"
+            android:textSize="16dp"/>
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Score"
-            android:id="@+id/statisticTitle03"
+            android:text="Large Text"
+            android:id="@+id/dataItem03"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#FF4081"
-            android:textSize="17dp"/>
+            android:textColor="#000000"
+            android:textSize="16dp"/>
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Date"
-            android:id="@+id/statisticTitle04"
+            android:text="Large Text"
+            android:id="@+id/dataItem04"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#FF4081"
-            android:textSize="17dp"/>
+            android:textColor="#000000"
+            android:textSize="16dp"/>
 
 
 
 
     </LinearLayout>
 
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
