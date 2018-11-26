@@ -1,25 +1,18 @@
 package com.team4.capstone.voiceofcau;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.view.View;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.util.TimerTask;
-
 
 public class SongscreenActivity extends AppCompatActivity {
     SharedPreferences prefs;
@@ -35,8 +28,6 @@ public class SongscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_song_screen);
 
         prefs = getSharedPreferences("MODE", MODE_PRIVATE);
@@ -44,7 +35,6 @@ public class SongscreenActivity extends AppCompatActivity {
         isScoring = prefs.getBoolean("isScoring", true);
 
         Intent intent = getIntent();
-
         Song = intent.getStringExtra("Songname");
         String[] datas = Song.split("_");
         SongName = datas[0];
@@ -132,32 +122,3 @@ public class SongscreenActivity extends AppCompatActivity {
     }
 
 }
-
-
-class CanvasView extends View{
-
-    public CanvasView(Context context){
-        super(context);
-    }
-    public CanvasView(Context context, AttributeSet att){
-        super(context, att);
-    }
-
-    public CanvasView(Context context, AttributeSet att, int ref){
-        super(context, att, ref);
-    }
-    int width;
-    int iheight;
-    int curpos;
-    int x1= 100, y1=200, x2=300, y2=400;
-
-    @Override
-    public void onDraw(Canvas c){
-        Paint paint = new Paint();
-        paint.setColor(Color.rgb(255, 94, 0));
-        c.drawRect(x1, y1,  x2, y2, paint);
-    }
-
-}
-
-
