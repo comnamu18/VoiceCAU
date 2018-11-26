@@ -2,15 +2,8 @@ package com.team4.capstone.voiceofcau;
 
 
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -34,11 +27,14 @@ public class StatisticActivity extends AppCompatActivity {
     DynamoDBMapper dynamoDBMapper;
     AWSCredentialsProvider credentialsProvider;
     String UserID;
+<<<<<<< HEAD
     boolean sema = false;
     ListView listview ;
     StatisticAdapter adapter;
     ArrayList<String[]>  datas;
 
+=======
+>>>>>>> parent of 94948a1... Statistic화면 구현
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         UserID = getIntent().getStringExtra("USERID");
@@ -55,6 +51,7 @@ public class StatisticActivity extends AppCompatActivity {
                 .awsConfiguration(configuration)
                 .build();
 
+<<<<<<< HEAD
         // Adapter 생성
         adapter = new StatisticAdapter() ;
 
@@ -93,6 +90,10 @@ public class StatisticActivity extends AppCompatActivity {
 
             }
         }) ;
+=======
+        Log.d("STAT", "STARTING");
+        getScoreStat();
+>>>>>>> parent of 94948a1... Statistic화면 구현
     }
 
     public void getScoreStat() {
@@ -114,11 +115,15 @@ public class StatisticActivity extends AppCompatActivity {
                 // Loop through query results
                 for (int i = 0; i < result.size(); i++) {
                     String jsonFormOfItem = gson.toJson(result.get(i));
+<<<<<<< HEAD
                     Log.d("TESTJSON", jsonFormOfItem);
                     String[] a = jsonFormOfItem.split("\"");
                     Log.d("TESTJSON", a[3]);
                     datas.add(jsonFormOfItem.split("\""));
                     Log.d("datasLenght", String.valueOf(datas.size()));
+=======
+                    stringBuilder.append(jsonFormOfItem + "\n\n");
+>>>>>>> parent of 94948a1... Statistic화면 구현
                 }
 
                 // Add your code here to deal with the data result
