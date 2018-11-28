@@ -111,14 +111,14 @@ public class    AudioController{
         }
 
         final int sizeInBytes = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, CHANNEL, ENCODING);
-        final AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC,
+        stream = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, CHANNEL, ENCODING, sizeInBytes);
 
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
                 RECORDER_BPP, 1, true, false);
         TarsosDSPAudioInputStream audioStream = new AndroidAudioInputStream(stream, format);
         dispatcher = new AudioDispatcher(audioStream, audioBufferSize, 0);
-        MyPitchDetector myPitchDetector = new MyPitchDetector(mBOStream, BUFFER_SIZE, isRecord);
+        MyPitchDetector myPitchDetector = new MyPitchDetector(mBOStream, BUFFER_SIZE, isRecord, isScoring);
         audioProcessor = new PitchProcessor(PitchEstimationAlgorithm.FFT_YIN,
                 RECORDER_SAMPLERATE, audioBufferSize, myPitchDetector);
         dispatcher.addAudioProcessor(audioProcessor);
@@ -128,7 +128,7 @@ public class    AudioController{
             scoreThread.start();
         }
     }
-    private byte[] getFileHeader() {
+    public byte[] getFileHeader() {
         byte[] header = new byte[HEADER_SIZE];
         int totalDataLen = mAudioLen + 40;
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * 1/8;
@@ -196,7 +196,10 @@ public class    AudioController{
                 mBOStream.flush();
                 mBIStream.close();
                 mBOStream.close();
+
                 TestOverLay test = new TestOverLay(TMP_WAVE_FILE, finalFile);
+                test.runM4AConverter();
+
             }catch (Exception e) {
                 Log.d("testing", "mBOS CreateFail");
             }
@@ -273,12 +276,14 @@ class  MyPitchDetector implements PitchDetectionHandler{
     private BufferedOutputStream mBOStream;
     private int BUFFER_SIZE;
     private boolean isRecord;
+    private boolean isScoring;
     byte[] data;
-    public MyPitchDetector(BufferedOutputStream mBOStream, int BUFFER_SIZE, boolean isRecord){
+    public MyPitchDetector(BufferedOutputStream mBOStream, int BUFFER_SIZE, boolean isRecord, boolean isScoring){
         this.mBOStream = mBOStream;
         this.BUFFER_SIZE = BUFFER_SIZE;
         data = new byte[BUFFER_SIZE];
         this.isRecord = isRecord;
+        this.isScoring = isScoring;
     }
     //Here the result of pitch is always less than half.
     @Override
@@ -293,13 +298,14 @@ class  MyPitchDetector implements PitchDetectionHandler{
                 Log.d("testing", "mBOS Write Fail");
             }
         }
-        if(pitch != -1 && pitch < 8000){
-            double timeStamp = audioEvent.getTimeStamp();
-            int intvNum = getintvNum(pitch);
-            CalculateScore.Time.add(timeStamp);
-            CalculateScore.Interval.add(intvNum);
+        if(isScoring){
+            if(pitch != -1 && pitch < 8000){
+                double timeStamp = audioEvent.getTimeStamp();
+                int intvNum = getintvNum(pitch);
+                CalculateScore.Time.add(timeStamp);
+                CalculateScore.Interval.add(intvNum);
+            }
         }
-
     }
 
     private int getintvNum(float pitch) {

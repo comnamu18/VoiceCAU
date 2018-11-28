@@ -43,6 +43,8 @@ public class TestOverLay {
     public TestOverLay(String audioFile, String outputFile){
         AUDIO_RECORDING_FILE_NAME = audioFile;
         COMPRESSED_AUDIO_FILE_NAME = outputFile;
+    }
+    public void runM4AConverter(){
         Runnable convert = new Runnable() {
             @Override
             public void run() {
@@ -50,17 +52,13 @@ public class TestOverLay {
                     String filePath = AUDIO_RECORDING_FILE_NAME;
                     File inputFile = new File(filePath);
                     FileInputStream fis = new FileInputStream(inputFile);
-
                     File outputFile = new File(COMPRESSED_AUDIO_FILE_NAME);
                     if (outputFile.exists()) outputFile.delete();
-
                     MediaMuxer mux = new MediaMuxer(outputFile.getAbsolutePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-
                     MediaFormat outputFormat = MediaFormat.createAudioFormat(COMPRESSED_AUDIO_FILE_MIME_TYPE,SAMPLING_RATE, 1);
                     outputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
                     outputFormat.setInteger(MediaFormat.KEY_BIT_RATE, COMPRESSED_AUDIO_FILE_BIT_RATE);
                     outputFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 16384);
-
                     MediaCodec codec = MediaCodec.createEncoderByType(COMPRESSED_AUDIO_FILE_MIME_TYPE);
                     codec.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
                     codec.start();
@@ -137,14 +135,11 @@ public class TestOverLay {
                 } catch (IOException e) {
                     Log.e(LOGTAG, "IO exception!", e);
                 }
-
-                //mStop = false;
-                // Notify UI thread...
             }
         };
         convert.run();
     }
-
+    //videoFile = .mp4 audioFile = .m4a outputFile = .mp4
     public boolean mux(String videoFile, String audioFile, String outputFile) {
         Movie video;
         try {
@@ -191,7 +186,6 @@ public class TestOverLay {
         }
         return true;
     }
-
     private static class BufferedWritableFileByteChannel implements WritableByteChannel {
         private static final int BUFFER_CAPACITY = 1000000;
 
@@ -242,5 +236,9 @@ public class TestOverLay {
         }
     }
 
+    public void mixSound(String firstFile, String secondFile, String outputFile) throws IOException {
+
+
+    }
 
 }

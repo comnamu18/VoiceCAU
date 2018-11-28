@@ -27,6 +27,8 @@ public class PopupActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_popup);
 
+
+
         //UI 객체생성
         txtText = (TextView)findViewById(R.id.popupText);
         if (type < 3){
@@ -74,6 +76,7 @@ public class PopupActivity extends Activity {
             finish();
         }
     }
+
     //계속하기 or 연습모드
     public void Continue (View v){
         if(type < 1){

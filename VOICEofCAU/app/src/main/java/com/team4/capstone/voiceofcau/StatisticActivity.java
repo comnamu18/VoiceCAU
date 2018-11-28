@@ -50,11 +50,6 @@ public class StatisticActivity extends AppCompatActivity {
         credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
         AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
 
-
-
-
-
-
         // Add code to instantiate a AmazonDynamoDBClient
         AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
         dynamoDBClient.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
