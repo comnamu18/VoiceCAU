@@ -47,9 +47,11 @@ import static java.lang.Math.abs;
 public class    AudioController{
     private final int HEADER_SIZE = 0x2c;
     private final int RECORDER_BPP = 16;
+    public static final int SAMPLING_RATE = 16000;
     private final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     private final int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
-    private int BUFFER_SIZE;
+    private final String TMP_WAVE_FILE = "/storage/emulated/0/test.wav";
+    private int BUFFER_SIZE = 4096;
     private int RECORDER_SAMPLERATE;
     byte[] buffer = new byte[BUFFER_SIZE];
     private BufferedInputStream mBIStream;
@@ -66,7 +68,7 @@ public class    AudioController{
     AudioRecord stream;
     File waveFile;
     File tempFile;
-    File finalFile;
+    String finalFile;
 
     public AudioController(Context context, final String filePath, final String SongName, boolean isRecord, boolean isScoring){
         this.SongName = SongName;
@@ -80,9 +82,8 @@ public class    AudioController{
         int audioBufferSize = 2048;
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(new Date());
         //Setting Files
-        finalFile = new File(Environment.getExternalStorageDirectory()+"/"+ filePath + "_" + date + ".aac");
-        Log.d("final", finalFile.toString());
-        waveFile = new File(Environment.getExternalStorageDirectory()+"/TEST.wav");
+        finalFile = Environment.getExternalStorageDirectory()+"/"+ filePath + "_" + date + ".m4a";
+        waveFile = new File(TMP_WAVE_FILE);
         tempFile = new File(Environment.getExternalStorageDirectory()+"/temp.bak");
 
         try {
@@ -93,7 +94,6 @@ public class    AudioController{
         }
 
         StringTokenizer myTokens;
-
         try {
             String scoreCSV = filePath + "score26.csv";
             InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
@@ -108,13 +108,12 @@ public class    AudioController{
             }
             reader.close();
         } catch (Exception e) {
-
             e.printStackTrace();
         }
 
-
-        BUFFER_SIZE = 4096;
-        stream = createAudioRecord();
+        final int sizeInBytes = AudioRecord.getMinBufferSize(SAMPLING_RATE, CHANNEL, ENCODING);
+        final AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                SAMPLING_RATE, CHANNEL, ENCODING, sizeInBytes);
 
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
                 RECORDER_BPP, 1, true, false);
@@ -129,26 +128,6 @@ public class    AudioController{
             scoreThread = new Thread(dispatcher, "Dispatcher");
             scoreThread.start();
         }
-    }
-    private AudioRecord createAudioRecord() {
-        int[] SAMPLE_RATE_CANDIDATES = {16000, 11025, 22050, 44100};
-        for (int sampleRate : SAMPLE_RATE_CANDIDATES) { // 후보군 for-loop
-            final int sizeInBytes = AudioRecord.getMinBufferSize(sampleRate, CHANNEL, ENCODING);
-            if (sizeInBytes == AudioRecord.ERROR_BAD_VALUE) { // 값이 비정상임
-                continue; // 통과
-            }
-            final AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                    sampleRate, CHANNEL, ENCODING, sizeInBytes); // AudioRecord init 시도
-            if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) { // 성공?
-                buffer = new byte[sizeInBytes]; // byte[] 버퍼 생성
-                RECORDER_SAMPLERATE = sampleRate;
-                Log.d("SampleRate", String.valueOf(sampleRate));
-                return audioRecord;
-            } else {
-                audioRecord.release(); // 실패했으니 릴리즈.
-            }
-        }
-        return null;
     }
     private byte[] getFileHeader() {
         byte[] header = new byte[HEADER_SIZE];
@@ -186,9 +165,9 @@ public class    AudioController{
         header[29] = (byte) ((byteRate >> 8) & 0xff);
         header[30] = (byte) ((byteRate >> 16) & 0xff);
         header[31] = (byte) ((byteRate >> 24) & 0xff);
-        header[32] = (byte) RECORDER_BPP * 1/8;  // block align
+        header[32] = (byte) RECORDER_BPP /8;  // block align
         header[33] = 0;
-        header[34] = RECORDER_BPP;  // bits per sample
+        header[34] = RECORDER_BPP;// bits per sample
         header[35] = 0;
         header[36] = 'd';
         header[37] = 'a';
@@ -200,6 +179,7 @@ public class    AudioController{
         header[43] = (byte)((mAudioLen >> 24) & 0xff);
         return header;
     }
+
     public int stopAudioProcessor(){
         if (isRecord) {
             // Saving as File
@@ -217,9 +197,7 @@ public class    AudioController{
                 mBOStream.flush();
                 mBIStream.close();
                 mBOStream.close();
-                /*
-                MediaEncoder mediaEncoder = new MediaEncoder(mAudioLen);
-                mediaEncoder.encode(waveFile, finalFile);*/
+                TestOverLay test = new TestOverLay(TMP_WAVE_FILE, finalFile);
             }catch (Exception e) {
                 Log.d("testing", "mBOS CreateFail");
             }
@@ -315,9 +293,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
             } catch (Exception e){
                 Log.d("testing", "mBOS Write Fail");
             }
-
         }
-
         if(pitch != -1 && pitch < 8000){
             double timeStamp = audioEvent.getTimeStamp();
             int intvNum = getintvNum(pitch);

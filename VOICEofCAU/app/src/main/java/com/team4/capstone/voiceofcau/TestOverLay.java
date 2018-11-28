@@ -32,7 +32,7 @@ import java.nio.channels.WritableByteChannel;
 //https://github.com/sannies/mp4parser/blob/master/README.md
 public class TestOverLay {
     public static String AUDIO_RECORDING_FILE_NAME; // Input PCM file
-    public static final String COMPRESSED_AUDIO_FILE_NAME = "/storage/emulated/0/converted.mp4"; // Output MP4/M4A file
+    public static String COMPRESSED_AUDIO_FILE_NAME; // Output MP4/M4A file
     public static final String COMPRESSED_AUDIO_FILE_MIME_TYPE = "audio/mp4a-latm";
     public static final int COMPRESSED_AUDIO_FILE_BIT_RATE = 64000; // 64kbps
     public static final int SAMPLING_RATE = 16000;
@@ -40,8 +40,9 @@ public class TestOverLay {
     public static final int CODEC_TIMEOUT_IN_MS = 5000;
     public static boolean isConverted = false;
     String LOGTAG = "CONVERT AUDIO";
-    public TestOverLay(String audioFile){
+    public TestOverLay(String audioFile, String outputFile){
         AUDIO_RECORDING_FILE_NAME = audioFile;
+        COMPRESSED_AUDIO_FILE_NAME = outputFile;
         Runnable convert = new Runnable() {
             @Override
             public void run() {
