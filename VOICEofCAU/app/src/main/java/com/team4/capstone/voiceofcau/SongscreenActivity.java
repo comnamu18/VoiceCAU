@@ -48,15 +48,13 @@ public class SongscreenActivity extends AppCompatActivity {
         isRecord= prefs.getBoolean("isRecord", true);
         isScoring = prefs.getBoolean("isScoring", true);
 
+        itvView = (CanvasView)(findViewById(R.id.CanvasView));
+        translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
 
         Intent intent = getIntent();
         Song = intent.getStringExtra("Songname");
         String[] datas = Song.split("_");
         SongName = datas[0];
-        if(SongName.equals("myway")) {
-            itvView = (CanvasView)(findViewById(R.id.CanvasView));
-            translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
-        }
         String SongPath = datas[1];
         type = Integer.parseInt(datas[2]);
         switch (type){
@@ -181,7 +179,6 @@ class CanvasView extends View {
     int canvasID = generateViewId();
     @Override
     public void onDraw(Canvas c) {
-        try {
             Paint paint = new Paint();
             c.drawColor(Color.BLACK);
             Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() * 31, 520, Bitmap.Config.ARGB_8888);
@@ -321,9 +318,7 @@ class CanvasView extends View {
 //        bm.setHeight(52);
 //        bm.setWidth(2000);
             c.drawBitmap(bm, 10 + bx, 10, paint);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 }
 

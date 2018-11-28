@@ -47,12 +47,11 @@ import static java.lang.Math.abs;
 public class    AudioController{
     private final int HEADER_SIZE = 0x2c;
     private final int RECORDER_BPP = 16;
-    public static final int SAMPLING_RATE = 16000;
+    private final int RECORDER_SAMPLERATE = 16000;
     private final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     private final int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
     private final String TMP_WAVE_FILE = "/storage/emulated/0/test.wav";
     private int BUFFER_SIZE = 4096;
-    private int RECORDER_SAMPLERATE;
     byte[] buffer = new byte[BUFFER_SIZE];
     private BufferedInputStream mBIStream;
     private BufferedOutputStream mBOStream;
@@ -95,7 +94,7 @@ public class    AudioController{
 
         StringTokenizer myTokens;
         try {
-            String scoreCSV = filePath + "score26.csv";
+            String scoreCSV = filePath + "score.csv";
             InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
             BufferedReader reader = new BufferedReader(is);
             String str2;
@@ -111,9 +110,9 @@ public class    AudioController{
             e.printStackTrace();
         }
 
-        final int sizeInBytes = AudioRecord.getMinBufferSize(SAMPLING_RATE, CHANNEL, ENCODING);
+        final int sizeInBytes = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, CHANNEL, ENCODING);
         final AudioRecord stream = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                SAMPLING_RATE, CHANNEL, ENCODING, sizeInBytes);
+                RECORDER_SAMPLERATE, CHANNEL, ENCODING, sizeInBytes);
 
         TarsosDSPAudioFormat format = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE,
                 RECORDER_BPP, 1, true, false);
