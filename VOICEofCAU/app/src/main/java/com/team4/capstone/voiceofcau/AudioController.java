@@ -128,7 +128,7 @@ public class    AudioController{
             scoreThread.start();
         }
     }
-    public byte[] getFileHeader() {
+    private byte[] getFileHeader() {
         byte[] header = new byte[HEADER_SIZE];
         int totalDataLen = mAudioLen + 40;
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * 1/8;

@@ -206,7 +206,6 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 ed.putBoolean("isRecord", isRecord);
                                 ed.commit();
-                                downloadWithTransferUtility();
                                 break;
                             case R.id.action_sync:
                                 if (!prefs.contains("isScoring")) {

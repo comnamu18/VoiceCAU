@@ -3,6 +3,7 @@ package com.team4.capstone.voiceofcau;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
@@ -17,6 +18,7 @@ import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,6 +42,9 @@ public class TestOverLay {
     public static final int CODEC_TIMEOUT_IN_MS = 5000;
     public static boolean isConverted = false;
     String LOGTAG = "CONVERT AUDIO";
+    public TestOverLay(){
+        Log.d("TESTOVERLAY", "JUSTFORTEST");
+    }
     public TestOverLay(String audioFile, String outputFile){
         AUDIO_RECORDING_FILE_NAME = audioFile;
         COMPRESSED_AUDIO_FILE_NAME = outputFile;
@@ -237,8 +242,44 @@ public class TestOverLay {
     }
 
     public void mixSound(String firstFile, String secondFile, String outputFile) throws IOException {
+        int BUFFER_SIZE = 4096;
+        byte[] buffer1 = new byte[BUFFER_SIZE];
+        byte[] buffer2 = new byte[BUFFER_SIZE];
+        int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
+        int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
+        int read1, read2;
+        firstFile = "/storage/emulated/0/wav.wav";
+        secondFile = "/storage/emulated/0/wav2.wav";
+        outputFile = "/storage/emulated/0/output.wav";
+        File output = new File(outputFile);
+        if(output.exists()) output.delete();
 
-
+        FileInputStream in1 = new FileInputStream(new File(firstFile));
+        Log.d("mixing", "in1");
+        FileInputStream in2 = new FileInputStream(new File(secondFile));
+        Log.d("mixing", "in2");
+        BufferedOutputStream mBOStream = new BufferedOutputStream(new FileOutputStream(output));
+        int step = 0;
+        in2.skip(44);
+        while((read1 = in1.read(buffer1)) != -1){
+            read2 = in2.read(buffer2);
+            if ((read2 != -1) && (step > 43) ) {
+                byte[] writeBuffer = new byte[BUFFER_SIZE];
+                for ( int i = 0 ; i < BUFFER_SIZE; i++) {
+                    writeBuffer[i] = (byte)((byte)buffer1[i] + (byte)buffer2[i]);
+                }
+                mBOStream.write(writeBuffer);
+            }
+            else{
+                mBOStream.write(buffer1);
+            }
+            step++;
+        }
+        Log.d("mixing", "finish");
+        in1.close();
+        in2.close();
+        mBOStream.flush();
+        mBOStream.close();
     }
 
 }
