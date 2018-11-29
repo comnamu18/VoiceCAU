@@ -327,10 +327,8 @@ class CanvasView extends View {
             iwidth = singer.singerEndTime.get(i).intValue() - singer.singerStartTime.get(i).intValue();
 
             cv.drawRect(icurpos, iheight + 16 , icurpos + iwidth, iheight, paint);
-       }
-//        bm.setHeight(52);
-//        bm.setWidth(2000);
-          c.drawBitmap(bm, 10 + bx, 10, paint);
+        }
+        c.drawBitmap(bm, 10 + bx, 10, paint);
     }
 }
 
