@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
@@ -48,60 +49,50 @@ public class SongscreenActivity extends AppCompatActivity {
         isRecord= prefs.getBoolean("isRecord", true);
         isScoring = prefs.getBoolean("isScoring", true);
 
-        itvView = (CanvasView)(findViewById(R.id.CanvasView));
-        translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
-
         Intent intent = getIntent();
         Song = intent.getStringExtra("Songname");
         String[] datas = Song.split("_");
         SongName = datas[0];
         String SongPath = datas[1];
         type = Integer.parseInt(datas[2]);
-        switch (type){
-            case 1:
-                Song = SongName + "_" + SongPath + "_4_" + datas[3];
-                break;
-            case 3:
-                Song = SongName + "_" + SongPath + "_8_" + datas[3];
-                break;
-                default:
-                    Song = SongName + "_" + SongPath + "_" + datas[2] + "_" + datas[3];
-                    break;
-        }
-
 
         TextView textView=(TextView)findViewById(R.id.song_name);
         textView.setText(SongName);
 
-        /*
         if(type != 4) {
             isScoring = false;
         }
-        if(type == 8) {
+        else{
+            itvView = (CanvasView)(findViewById(R.id.CanvasView));
+            translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
+        }
+        if(type == 5) {
             isRecord = false;
-        }*/
+        }
 
         if (isRecord){
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
         audioController = new AudioController(
-                getApplicationContext(), SongPath, SongName, true, false);
+                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
 
         videoView = (VideoView) findViewById(R.id.videoView);
         mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
-        Uri video = Uri.parse("android.resource://"+getPackageName()+"/raw/"+SongPath);
+        Uri video = Uri.parse(Environment.getExternalStorageDirectory().toString()
+                + "/" + SongPath + ".mp4");
         videoView.setVideoURI(video);
         videoView.requestFocus();
         mediaController.setPadding(0, 0, 0, 80);
+
         videoView.start();
 
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
-                int score = audioController.stopAudioProcessor();
+                int score = audioController.stopAudioProcessor(true);
                 Song = Song + "_" + String.valueOf(score);
                 intent.putExtra("Score", Song);
                 startActivity(intent);
@@ -127,14 +118,14 @@ public class SongscreenActivity extends AppCompatActivity {
                     videoView.start();
                     break;
                 case MainActivity.RESULT_BEGIN:
-                    audioController.stopAudioProcessor();
+                    audioController.stopAudioProcessor(false);
                     Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
                     intent.putExtra("Songname", Song);
                     startActivity(intent);
                     finish();
                     break;
                 case MainActivity.RESULT_MAIN:
-                    audioController.stopAudioProcessor();
+                    audioController.stopAudioProcessor(false);
                     finish();
                     break;
             }
@@ -179,6 +170,7 @@ class CanvasView extends View {
     int canvasID = generateViewId();
     @Override
     public void onDraw(Canvas c) {
+        try{
             Paint paint = new Paint();
             c.drawColor(Color.BLACK);
             Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() * 31, 520, Bitmap.Config.ARGB_8888);
@@ -318,7 +310,9 @@ class CanvasView extends View {
 //        bm.setHeight(52);
 //        bm.setWidth(2000);
             c.drawBitmap(bm, 10 + bx, 10, paint);
-
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

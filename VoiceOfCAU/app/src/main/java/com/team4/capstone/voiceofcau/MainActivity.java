@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     public static final int RESULT_CANCEL = -1;
     public static final int SUCCESS_FROM_POPUP = 1;
     public static final int SUCCESS_FROM_SEARCH = 2;
-    public static final int SUCCESS_FROM_DUET = 3;
+    public static final int SUCCESS_FROM_PROGRESSBAR = 3;
     public static final int RESULT_MAIN = 45;
     public static final int RESULT_CONT = 44;
     public static final int RESULT_BEGIN = 43;
@@ -155,7 +155,6 @@ public class MainActivity extends AppCompatActivity
 
         //리스트 뷰에 어댑터를 셋팅 함
         listView.setAdapter(adapter);
-        //리스트 뷰를 클릭하면 해당 위치값을 받아와서 그 위치값의 Data를 읽어와서 curData에 저장한 후 Toast로 보여줌
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -239,7 +238,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void downloadWithTransferUtility() {
+    private void downloadWithTransferUtility(String SongName) {
         TransferUtility transferUtility =
                 TransferUtility.builder()
                         .context(getApplicationContext())
@@ -248,8 +247,8 @@ public class MainActivity extends AppCompatActivity
                         .build();
         TransferObserver downloadObserver =
                 transferUtility.download(
-                        "public/good.mp4",
-                        new File("/storage/emulated/0/test.mp4"));
+                        "public/" + SongName + ".mp4",
+                        new File("/storage/emulated/0/" + SongName +".mp4"));
         // Attach a listener to the observer to get state update and progress notifications
         downloadObserver.setTransferListener(new TransferListener() {
             @Override
@@ -282,7 +281,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
-        //or switch문을 이용하면 될듯 하다.
 
         if (id == R.id.action_search) {
             Intent intent1;
@@ -300,18 +298,44 @@ public class MainActivity extends AppCompatActivity
             case SUCCESS_FROM_POPUP:
                 switch (resultCode) {
                     case RESULT_DUET:
-                        String SongData1 = data.getStringExtra("SongData");
                         Intent intent1 = new Intent(getApplicationContext(), PopupActivity.class);
-                        intent1.putExtra("Songname", SongData1);
-                        startActivityForResult(intent1, SUCCESS_FROM_DUET);
+                        intent1.putExtra("Songname", data.getStringExtra("SongData"));
+                        startActivityForResult(intent1, SUCCESS_FROM_POPUP);
                         break;
                     case RESULT_CANCEL:
                         break;
+                    case RESULT_PART_A:
+                    case RESULT_PART_B:
                     default :
-                        String SongData = data.getStringExtra("SongData");
-                        Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
-                        intent.putExtra("Songname", SongData);
-                        startActivity(intent);
+                        String[] intentDatas = data.getStringExtra("SongData").split("_");
+                        String SongName = intentDatas[1];
+                        int SongType = Integer.valueOf(intentDatas[2]);
+                        switch (SongType){
+                            case 2:
+                                SongName += "pr";
+                                break;
+                            case 6:
+                                SongName += "duA";
+                                break;
+                            case 7:
+                                SongName += "duB";
+                                break;
+                        }
+                        String intentData = intentDatas[0] + "_" + SongName + "_" +
+                                intentDatas[2] + "_" + intentDatas[3];
+                        String newFile = Environment.getExternalStorageDirectory().toString()
+                                + "/" + SongName + ".mp4";
+                        File mp4Video = new File(newFile);
+                        if (!mp4Video.exists()){
+                            Intent intent = new Intent(getApplicationContext(), ProgressDialogActivity.class);
+                            intent.putExtra("SongName", intentData);
+                            startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);
+                        }
+                        else{
+                            Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                            intent.putExtra("Songname", intentData);
+                            startActivity(intent);
+                        }
                         break;
                 }
                 break;
@@ -324,14 +348,14 @@ public class MainActivity extends AppCompatActivity
                     startActivityForResult(intent, SUCCESS_FROM_POPUP);
                 }
                 break;
-            case SUCCESS_FROM_DUET:
-                switch (resultCode) {
-                    case RESULT_PART_A:
-                        Toast.makeText(getApplicationContext(), "PART_A", Toast.LENGTH_LONG).show();
-                        break;
-                    case RESULT_PART_B:
-                        Toast.makeText(getApplicationContext(), "PART_B", Toast.LENGTH_LONG).show();
-                        break;
+            case SUCCESS_FROM_PROGRESSBAR:
+                if (resultCode != RESULT_CANCEL){
+                    Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                    intent.putExtra("Songname", data.getStringExtra("SongData"));
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "ERROR WHILE DOWNLOAD", Toast.LENGTH_LONG).show();
                 }
                 break;
         }

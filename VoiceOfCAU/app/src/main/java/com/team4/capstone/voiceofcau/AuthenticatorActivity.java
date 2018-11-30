@@ -68,6 +68,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                         .build();
 
         SignInUI signin = (SignInUI) AWSMobileClient.getInstance().getClient(AuthenticatorActivity.this, SignInUI.class);
-        signin.login(AuthenticatorActivity.this, AuthenticatorActivity.class).authUIConfiguration(config).execute();
+        signin.login(AuthenticatorActivity.this, PopupNoB.class).authUIConfiguration(config).execute();
     }
 }

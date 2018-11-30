@@ -26,17 +26,10 @@ public class PopupActivity extends Activity {
         //타이틀바 없애기
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_popup);
-        TestOverLay test = new TestOverLay();
-
-        try{
-            test.mixSound("!","2","3");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
         //UI 객체생성
         txtText = (TextView)findViewById(R.id.popupText);
-        if (type < 3){
+        if (type == 1){
             txtText.setText(songName);
             Button button = (Button)findViewById(R.id.popup_button1);
             button.setText(R.string.popup_button11);
@@ -61,7 +54,7 @@ public class PopupActivity extends Activity {
     }
     //돌아가기 or 일반모드
     public void Return (View v){
-        if(type < 3){
+        if(type == 1){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_1_" + datas[3];
             intent.putExtra("SongData", SongData);
@@ -84,7 +77,7 @@ public class PopupActivity extends Activity {
 
     //계속하기 or 연습모드
     public void Continue (View v){
-        if(type < 1){
+        if(type == 1){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_2_" + datas[3];
             intent.putExtra("SongData", SongData);
@@ -106,7 +99,7 @@ public class PopupActivity extends Activity {
 
     //메인 메뉴로 돌아가기 or 듀엣모드
     public void Main (View v){
-        if(type < 4){
+        if(type == 1){
             Intent intent = new Intent();
             String SongData = datas[0] + "_" + datas[1] + "_3_" + datas[3];
             intent.putExtra("SongData", SongData);

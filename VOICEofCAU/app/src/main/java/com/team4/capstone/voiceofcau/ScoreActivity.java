@@ -27,7 +27,7 @@ public class ScoreActivity extends AppCompatActivity {
     AWSCredentialsProvider credentialsProvider;
     String UserID;
     private String SongName;
-    private String score;
+    private int score;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +48,8 @@ public class ScoreActivity extends AppCompatActivity {
         final String rawScore = intent.getStringExtra("Score");
         SongName = rawScore.split("_")[0];
         UserID = rawScore.split("_")[3];
-        score = rawScore.split("_")[4];
-        if(score != "-1") {
+        score = Integer.valueOf(rawScore.split("_")[4]);
+        if(score != -1) {
             createScoreStat();
             String scoreStr = score + "점!";
             textView.setText(scoreStr);
@@ -78,7 +78,8 @@ public class ScoreActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
-                String reTry = rawScore.split("_")[0] + "_" + rawScore.split("_")[1];
+                String reTry = rawScore.split("_")[0] + "_" + rawScore.split("_")[1]
+                        + rawScore.split("_")[2] + "_" + rawScore.split("_")[3];
                 intent.putExtra("Songname", reTry);
                 startActivity(intent);
                 finish();
@@ -91,7 +92,7 @@ public class ScoreActivity extends AppCompatActivity {
         final ScoreStatDO newScore = new ScoreStatDO();
         newScore.setUserId(UserID);
         newScore.setDate(date);
-        newScore.setScore(score);
+        newScore.setScore(String.valueOf(score));
         newScore.setSongName(SongName);
         new Thread(new Runnable() {
             @Override

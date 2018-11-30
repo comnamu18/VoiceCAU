@@ -179,8 +179,19 @@ public class    AudioController{
         return header;
     }
 
-    public int stopAudioProcessor(){
-        if (isRecord) {
+    public int stopAudioProcessor(boolean isSuccess){
+        if(!isSuccess){
+            try{
+                mBOStream.flush();
+                mBOStream.close();
+                if(waveFile.exists()) waveFile.delete();
+                if(tempFile.exists()) tempFile.delete();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if (isRecord && isSuccess) {
             // Saving as File
             try{
                 int read;
@@ -214,6 +225,9 @@ public class    AudioController{
         return -1;
     }
     public int getScore() {
+        if(!isScoring){
+            return -1;
+        }
         double score = 0;
         double totalTime = 0;
 
