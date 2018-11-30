@@ -66,8 +66,17 @@ public class SongscreenActivity extends AppCompatActivity {
             itvView = (CanvasView)(findViewById(R.id.CanvasView));
             translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
         }
-        if(type == 5) {
-            isRecord = false;
+
+        switch(type) {
+            case 1:
+                type = 4;
+                Song = datas[0] + "_" + datas[1] + "_" + String.valueOf(type) + "_" + datas[3];
+                break;
+            case 2:
+                type = 5;
+                isRecord = false;
+                Song = datas[0] + "_" + datas[1] + "_" + String.valueOf(type) + "_" +datas[3];
+                break;
         }
 
         if (isRecord){

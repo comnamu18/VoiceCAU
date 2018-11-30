@@ -30,8 +30,6 @@
         <activity android:name=".Detail_scoreActivity"></activity>
         <activity android:name=".SearchActivity"></activity>
         <activity android:name=".StatisticActivity"></activity>
-        <activity android:name=".ProgressDialogActivity"
-            android:theme="@android:style/Theme.Dialog"></activity>
         <activity android:name=".PopupActivity"
             android:theme="@android:style/Theme.Dialog"></activity>
         <activity android:name=".PopupNoB"

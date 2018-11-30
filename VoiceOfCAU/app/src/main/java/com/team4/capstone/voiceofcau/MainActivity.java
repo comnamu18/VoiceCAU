@@ -238,39 +238,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void downloadWithTransferUtility(String SongName) {
-        TransferUtility transferUtility =
-                TransferUtility.builder()
-                        .context(getApplicationContext())
-                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
-                        .build();
-        TransferObserver downloadObserver =
-                transferUtility.download(
-                        "public/" + SongName + ".mp4",
-                        new File("/storage/emulated/0/" + SongName +".mp4"));
-        // Attach a listener to the observer to get state update and progress notifications
-        downloadObserver.setTransferListener(new TransferListener() {
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-                if (TransferState.COMPLETED == state) {
-                    Toast.makeText(getApplicationContext(), "DOWNLOAD COMPLETE", Toast.LENGTH_LONG).show();
-                }
-            }
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
-                int percentDone = (int)percentDonef;
-                Log.d("DOWNLOAD", "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
-            }
-            @Override
-            public void onError(int id, Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
@@ -327,7 +294,7 @@ public class MainActivity extends AppCompatActivity
                                 + "/" + SongName + ".mp4";
                         File mp4Video = new File(newFile);
                         if (!mp4Video.exists()){
-                            Intent intent = new Intent(getApplicationContext(), ProgressDialogActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), PopupNoB.class);
                             intent.putExtra("SongName", intentData);
                             startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);
                         }
