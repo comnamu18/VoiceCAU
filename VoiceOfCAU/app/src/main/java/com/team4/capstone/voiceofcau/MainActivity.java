@@ -228,16 +228,6 @@ public class MainActivity extends AppCompatActivity
                                 break;
 
                             case R.id.action_stat:
-                                /*
-                                String root = Environment.getExternalStorageDirectory().toString();
-                                String audio = root + "/sample.m4a";
-                                String video = root + "/everytime.mp4";
-                                String output = root + "/ouput.mp4";
-                                String testF = root + "/test.wav";
-                                Log.e("FILE", "audio:"+audio + " video:"+video+ " out:"+output);
-                                TestOverLay test = new TestOverLay(testF);
-                                test.mux(video, audio, output);
-                                */
                                 intent = new Intent(getApplicationContext(), StatisticActivity.class);
                                 intent.putExtra("USERID", UserID);
                                 startActivity(intent);
@@ -246,6 +236,39 @@ public class MainActivity extends AppCompatActivity
                         return false;
                     }
                 });
+
+    }
+
+    private void downloadWithTransferUtility() {
+        TransferUtility transferUtility =
+                TransferUtility.builder()
+                        .context(getApplicationContext())
+                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
+                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance().getCredentialsProvider()))
+                        .build();
+        TransferObserver downloadObserver =
+                transferUtility.download(
+                        "public/good.mp4",
+                        new File("/storage/emulated/0/test.mp4"));
+        // Attach a listener to the observer to get state update and progress notifications
+        downloadObserver.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                if (TransferState.COMPLETED == state) {
+                    Toast.makeText(getApplicationContext(), "DOWNLOAD COMPLETE", Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
+                int percentDone = (int)percentDonef;
+                Log.d("DOWNLOAD", "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
+            }
+            @Override
+            public void onError(int id, Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
     }
 

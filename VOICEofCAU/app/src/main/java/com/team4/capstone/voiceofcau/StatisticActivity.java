@@ -27,6 +27,9 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.google.gson.Gson;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -47,6 +50,7 @@ public class StatisticActivity extends AppCompatActivity {
         setContentView(R.layout.activity_statistic);
         credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
         AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
+
         // Add code to instantiate a AmazonDynamoDBClient
         AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
         dynamoDBClient.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
@@ -109,24 +113,13 @@ public class StatisticActivity extends AppCompatActivity {
                 PaginatedList<ScoreStatDO> result = dynamoDBMapper.query(ScoreStatDO.class, queryExpression);
 
                 Gson gson = new Gson();
-                StringBuilder stringBuilder = new StringBuilder();
-                //test
                 // Loop through query results
                 for (int i = 0; i < result.size(); i++) {
                     String jsonFormOfItem = gson.toJson(result.get(i));
-                    Log.d("TESTJSON", jsonFormOfItem);
                     String[] a = jsonFormOfItem.split("\"");
-                    Log.d("TESTJSON", a[3]);
                     datas.add(jsonFormOfItem.split("\""));
-                    Log.d("datasLenght", String.valueOf(datas.size()));
                 }
 
-                // Add your code here to deal with the data result
-                Log.d("Query result: ", stringBuilder.toString());
-
-                if (result.isEmpty()) {
-                    // There were no items matching your query.
-                }
                 sema = true;
             }
         }).start();

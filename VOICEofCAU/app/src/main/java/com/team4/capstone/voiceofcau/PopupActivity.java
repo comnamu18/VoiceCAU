@@ -26,6 +26,13 @@ public class PopupActivity extends Activity {
         //타이틀바 없애기
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_popup);
+        TestOverLay test = new TestOverLay();
+
+        try{
+            test.mixSound("!","2","3");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         //UI 객체생성
         txtText = (TextView)findViewById(R.id.popupText);
@@ -74,6 +81,7 @@ public class PopupActivity extends Activity {
             finish();
         }
     }
+
     //계속하기 or 연습모드
     public void Continue (View v){
         if(type < 1){

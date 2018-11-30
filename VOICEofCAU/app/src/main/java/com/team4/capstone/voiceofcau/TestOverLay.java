@@ -3,6 +3,7 @@ package com.team4.capstone.voiceofcau;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
@@ -17,6 +18,7 @@ import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,7 +34,7 @@ import java.nio.channels.WritableByteChannel;
 //https://github.com/sannies/mp4parser/blob/master/README.md
 public class TestOverLay {
     public static String AUDIO_RECORDING_FILE_NAME; // Input PCM file
-    public static final String COMPRESSED_AUDIO_FILE_NAME = "/storage/emulated/0/converted.mp4"; // Output MP4/M4A file
+    public static String COMPRESSED_AUDIO_FILE_NAME; // Output MP4/M4A file
     public static final String COMPRESSED_AUDIO_FILE_MIME_TYPE = "audio/mp4a-latm";
     public static final int COMPRESSED_AUDIO_FILE_BIT_RATE = 64000; // 64kbps
     public static final int SAMPLING_RATE = 16000;
@@ -40,8 +42,14 @@ public class TestOverLay {
     public static final int CODEC_TIMEOUT_IN_MS = 5000;
     public static boolean isConverted = false;
     String LOGTAG = "CONVERT AUDIO";
-    public TestOverLay(String audioFile){
+    public TestOverLay(){
+        Log.d("TESTOVERLAY", "JUSTFORTEST");
+    }
+    public TestOverLay(String audioFile, String outputFile){
         AUDIO_RECORDING_FILE_NAME = audioFile;
+        COMPRESSED_AUDIO_FILE_NAME = outputFile;
+    }
+    public void runM4AConverter(){
         Runnable convert = new Runnable() {
             @Override
             public void run() {
@@ -49,17 +57,13 @@ public class TestOverLay {
                     String filePath = AUDIO_RECORDING_FILE_NAME;
                     File inputFile = new File(filePath);
                     FileInputStream fis = new FileInputStream(inputFile);
-
                     File outputFile = new File(COMPRESSED_AUDIO_FILE_NAME);
                     if (outputFile.exists()) outputFile.delete();
-
                     MediaMuxer mux = new MediaMuxer(outputFile.getAbsolutePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-
                     MediaFormat outputFormat = MediaFormat.createAudioFormat(COMPRESSED_AUDIO_FILE_MIME_TYPE,SAMPLING_RATE, 1);
                     outputFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
                     outputFormat.setInteger(MediaFormat.KEY_BIT_RATE, COMPRESSED_AUDIO_FILE_BIT_RATE);
                     outputFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 16384);
-
                     MediaCodec codec = MediaCodec.createEncoderByType(COMPRESSED_AUDIO_FILE_MIME_TYPE);
                     codec.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
                     codec.start();
@@ -136,14 +140,11 @@ public class TestOverLay {
                 } catch (IOException e) {
                     Log.e(LOGTAG, "IO exception!", e);
                 }
-
-                //mStop = false;
-                // Notify UI thread...
             }
         };
         convert.run();
     }
-
+    //videoFile = .mp4 audioFile = .m4a outputFile = .mp4
     public boolean mux(String videoFile, String audioFile, String outputFile) {
         Movie video;
         try {
@@ -190,7 +191,6 @@ public class TestOverLay {
         }
         return true;
     }
-
     private static class BufferedWritableFileByteChannel implements WritableByteChannel {
         private static final int BUFFER_CAPACITY = 1000000;
 
@@ -241,5 +241,45 @@ public class TestOverLay {
         }
     }
 
+    public void mixSound(String firstFile, String secondFile, String outputFile) throws IOException {
+        int BUFFER_SIZE = 4096;
+        byte[] buffer1 = new byte[BUFFER_SIZE];
+        byte[] buffer2 = new byte[BUFFER_SIZE];
+        int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
+        int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
+        int read1, read2;
+        firstFile = "/storage/emulated/0/wav.wav";
+        secondFile = "/storage/emulated/0/wav2.wav";
+        outputFile = "/storage/emulated/0/output.wav";
+        File output = new File(outputFile);
+        if(output.exists()) output.delete();
+
+        FileInputStream in1 = new FileInputStream(new File(firstFile));
+        Log.d("mixing", "in1");
+        FileInputStream in2 = new FileInputStream(new File(secondFile));
+        Log.d("mixing", "in2");
+        BufferedOutputStream mBOStream = new BufferedOutputStream(new FileOutputStream(output));
+        int step = 0;
+        in2.skip(44);
+        while((read1 = in1.read(buffer1)) != -1){
+            read2 = in2.read(buffer2);
+            if ((read2 != -1) && (step > 43) ) {
+                byte[] writeBuffer = new byte[BUFFER_SIZE];
+                for ( int i = 0 ; i < BUFFER_SIZE; i++) {
+                    writeBuffer[i] = (byte)((byte)buffer1[i] + (byte)buffer2[i]);
+                }
+                mBOStream.write(writeBuffer);
+            }
+            else{
+                mBOStream.write(buffer1);
+            }
+            step++;
+        }
+        Log.d("mixing", "finish");
+        in1.close();
+        in2.close();
+        mBOStream.flush();
+        mBOStream.close();
+    }
 
 }
