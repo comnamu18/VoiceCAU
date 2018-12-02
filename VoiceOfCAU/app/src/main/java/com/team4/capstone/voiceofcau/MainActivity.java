@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity
     public static final int RESULT_PART_A = 9;
     public static final int RESULT_PART_B = 8;
 
-
     boolean isReocrdPermission = false;
     boolean isSavingPermission = false;
 
@@ -296,12 +295,30 @@ public class MainActivity extends AppCompatActivity
                         if (!mp4Video.exists()){
                             Intent intent = new Intent(getApplicationContext(), PopupNoB.class);
                             intent.putExtra("SongName", intentData);
+                            Log.d("START",SongName);
                             startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);
                         }
-                        else{
+                        else if (SongType != 6  && SongType != 7) {
                             Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
                             intent.putExtra("Songname", intentData);
                             startActivity(intent);
+                        }
+                        else { // If Duet Mode, wav file check is needed
+                            String wavFile = Environment.getExternalStorageDirectory().toString()
+                                    + "/" + SongName + ".wav";
+                            File tmp = new File(wavFile);
+                            if (!tmp.exists()) {
+                                Intent intent = new Intent(getApplicationContext(), PopupNoB.class);
+                                Log.d("START","DOWNLOAD M4a ACTIVITY");
+                                String tmpData = intentDatas[0] + "_" + SongName + "_9_" + intentDatas[3];
+                                intent.putExtra("SongName", tmpData);
+                                startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);
+                            }
+                            else{
+                                Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                                intent.putExtra("Songname", intentData);
+                                startActivity(intent);
+                            }
                         }
                         break;
                 }

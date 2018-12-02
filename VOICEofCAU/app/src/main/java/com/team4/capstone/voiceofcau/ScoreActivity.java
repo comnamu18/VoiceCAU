@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -27,7 +28,9 @@ public class ScoreActivity extends AppCompatActivity {
     AWSCredentialsProvider credentialsProvider;
     String UserID;
     private String SongName;
+    private String SongPath;
     private int score;
+    private int type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +50,8 @@ public class ScoreActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String rawScore = intent.getStringExtra("Score");
         SongName = rawScore.split("_")[0];
+        SongPath = rawScore.split("_")[1];
+        type = Integer.valueOf(rawScore.split("_")[2]);
         UserID = rawScore.split("_")[3];
         score = Integer.valueOf(rawScore.split("_")[4]);
         if(score != -1) {
@@ -68,6 +73,22 @@ public class ScoreActivity extends AppCompatActivity {
         Button btn2 = (Button)findViewById(R.id.score_detailbutton);
         btn2.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                if (type == 5) {
+                    Toast.makeText(getApplicationContext(), "연습모드는 다시 듣기를 지원하지 않습니다.",
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                if (type == 6 || type == 7 || type == 9) {
+                    TestOverLay muxing = new TestOverLay();
+                    try{
+                        muxing.mixSound("test.wav", SongPath + ".wav", "muxed.wav");
+                        muxing.runM4AConverter("/storage/emulated/0/muxed.wav", "/storage/emulated/0/muxed.m4a");
+                        muxing.mux(SongPath + ".mp4", "muxed.m4a", "duetMuxed.mp4");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 Intent intent = new Intent(getApplicationContext(), Detail_scoreActivity.class);
                 startActivity(intent);
                 finish();

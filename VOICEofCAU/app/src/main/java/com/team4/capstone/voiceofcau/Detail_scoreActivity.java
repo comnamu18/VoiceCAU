@@ -15,11 +15,7 @@ public class Detail_scoreActivity extends AppCompatActivity {
 
 
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-
-
         super.onBackPressed();
-
+        finish();
     }
 }

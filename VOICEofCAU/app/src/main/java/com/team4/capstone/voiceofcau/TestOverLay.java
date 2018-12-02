@@ -33,6 +33,7 @@ import java.nio.channels.WritableByteChannel;
 //https://stackoverflow.com/questions/8526552/encode-wav-to-aac-on-android
 //https://github.com/sannies/mp4parser/blob/master/README.md
 public class TestOverLay {
+    public static final String BASE_DIR = "/storage/emulated/0/";
     public static String AUDIO_RECORDING_FILE_NAME; // Input PCM file
     public static String COMPRESSED_AUDIO_FILE_NAME; // Output MP4/M4A file
     public static final String COMPRESSED_AUDIO_FILE_MIME_TYPE = "audio/mp4a-latm";
@@ -43,13 +44,10 @@ public class TestOverLay {
     public static boolean isConverted = false;
     String LOGTAG = "CONVERT AUDIO";
     public TestOverLay(){
-        Log.d("TESTOVERLAY", "JUSTFORTEST");
     }
-    public TestOverLay(String audioFile, String outputFile){
+    public void runM4AConverter(String audioFile, String outputFile){
         AUDIO_RECORDING_FILE_NAME = audioFile;
         COMPRESSED_AUDIO_FILE_NAME = outputFile;
-    }
-    public void runM4AConverter(){
         Runnable convert = new Runnable() {
             @Override
             public void run() {
@@ -146,6 +144,9 @@ public class TestOverLay {
     }
     //videoFile = .mp4 audioFile = .m4a outputFile = .mp4
     public boolean mux(String videoFile, String audioFile, String outputFile) {
+        videoFile = BASE_DIR + videoFile;
+        audioFile = BASE_DIR + audioFile;
+        outputFile = BASE_DIR + outputFile;
         Movie video;
         try {
             video = new MovieCreator().build(videoFile);
@@ -248,9 +249,9 @@ public class TestOverLay {
         int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
         int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
         int read1, read2;
-        firstFile = "/storage/emulated/0/wav.wav";
-        secondFile = "/storage/emulated/0/wav2.wav";
-        outputFile = "/storage/emulated/0/output.wav";
+        firstFile = BASE_DIR + firstFile;
+        secondFile = BASE_DIR + secondFile;
+        outputFile = BASE_DIR + outputFile;
         File output = new File(outputFile);
         if(output.exists()) output.delete();
 

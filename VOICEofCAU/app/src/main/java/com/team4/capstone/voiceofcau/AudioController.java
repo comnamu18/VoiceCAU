@@ -208,8 +208,8 @@ public class    AudioController{
                 mBIStream.close();
                 mBOStream.close();
 
-                TestOverLay test = new TestOverLay(TMP_WAVE_FILE, finalFile);
-                test.runM4AConverter();
+                TestOverLay test = new TestOverLay();
+                test.runM4AConverter(TMP_WAVE_FILE, finalFile);
 
             }catch (Exception e) {
                 Log.d("testing", "mBOS CreateFail");
