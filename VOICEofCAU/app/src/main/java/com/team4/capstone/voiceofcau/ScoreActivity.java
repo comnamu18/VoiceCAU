@@ -79,27 +79,17 @@ public class ScoreActivity extends AppCompatActivity {
                 }
                 else{
                     TestOverLay muxing = new TestOverLay();
-                    if (type == 6 || type == 7 || type == 9) {
-                        try{
-                            muxing.mixSound("test.wav", SongPath + ".wav", "muxed.wav");
-                            muxing.runM4AConverter("/storage/emulated/0/muxed.wav", "/storage/emulated/0/muxed.m4a");
-                            muxing.mux(SongPath + ".mp4", "muxed.m4a", "duetMuxed.mp4");
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    try{
+                        muxing.mixSound("test.wav", SongPath + ".wav", "muxed.wav");
+                        muxing.runM4AConverter("/storage/emulated/0/muxed.wav", "/storage/emulated/0/muxed.m4a");
+                        muxing.mux(SongPath + ".mp4", "muxed.m4a", "muxedOutput.mp4");
                     }
-                    else {
-                        try{
-                            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.KOREA).format(new Date());
-                            String finalFile = SongPath + "_" + date + ".m4a";
-                            muxing.mux(SongPath+".mp4", finalFile, "recordMuxed.mp4");
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Intent intent = new Intent(getApplicationContext(), Detail_scoreActivity.class);
+                    String intentData = SongName + "_" + "muxedOutput_8_" + rawScore.split("_")[3];
+                    Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                    intent.putExtra("Songname", intentData);
                     startActivity(intent);
                     finish();
                 }

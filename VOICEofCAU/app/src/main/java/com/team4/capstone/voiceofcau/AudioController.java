@@ -43,6 +43,7 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.sin;
 
 public class    AudioController{
     private final int HEADER_SIZE = 0x2c;
@@ -50,7 +51,7 @@ public class    AudioController{
     private final int RECORDER_SAMPLERATE = 16000;
     private final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     private final int ENCODING = android.media.AudioFormat.ENCODING_PCM_16BIT;
-    private final String TMP_WAVE_FILE = "/storage/emulated/0/test.wav";
+    private final String TMP_FILE = "/storage/emulated/0/test";
     private int BUFFER_SIZE = 4096;
     byte[] buffer = new byte[BUFFER_SIZE];
     private BufferedInputStream mBIStream;
@@ -82,8 +83,8 @@ public class    AudioController{
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.KOREA).format(new Date());
         //Setting Files
         finalFile = Environment.getExternalStorageDirectory()+"/"+ filePath + "_" + date + ".m4a";
-        waveFile = new File(TMP_WAVE_FILE);
-        tempFile = new File(Environment.getExternalStorageDirectory()+"/temp.bak");
+        waveFile = new File(TMP_FILE + ".wav");
+        tempFile = new File(TMP_FILE + ".bak");
 
         try {
             mBOStream = new BufferedOutputStream(new FileOutputStream(tempFile));
@@ -209,7 +210,7 @@ public class    AudioController{
                 mBOStream.close();
 
                 TestOverLay test = new TestOverLay();
-                test.runM4AConverter(TMP_WAVE_FILE, finalFile);
+                test.runM4AConverter(TMP_FILE + ".wav", finalFile);
 
             }catch (Exception e) {
                 Log.d("testing", "mBOS CreateFail");
@@ -222,6 +223,13 @@ public class    AudioController{
             scoreThread = null;
             return getScore();
         }
+        CalculateScore.Time.clear();
+        CalculateScore.Interval.clear();
+        singer.singerEndTime.clear();
+        singer.singerInterval.clear();
+        singer.singerStartTime.clear();
+        singer.singtitle.clear();
+
         return -1;
     }
     public int getScore() {
@@ -279,9 +287,6 @@ public class    AudioController{
                 i++;
             }
         }
-        CalculateScore.Time.clear();
-        CalculateScore.Interval.clear();
-
         return (int)score;
     }
 }

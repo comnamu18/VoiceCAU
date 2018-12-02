@@ -32,6 +32,7 @@ public class SongscreenActivity extends AppCompatActivity {
     int type;
     boolean isRecord;
     boolean isScoring;
+    boolean isPractice = false;
     CanvasView itvView;
 
     @Override
@@ -52,14 +53,6 @@ public class SongscreenActivity extends AppCompatActivity {
         TextView textView=(TextView)findViewById(R.id.song_name);
         textView.setText(SongName);
 
-        if(type != 4) {
-            isScoring = false;
-        }
-        else{
-            itvView = (CanvasView)(findViewById(R.id.CanvasView));
-            translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
-        }
-
         switch(type) {
             case 1:
                 type = 4;
@@ -67,6 +60,7 @@ public class SongscreenActivity extends AppCompatActivity {
                 break;
             case 2:
                 type = 5;
+                isPractice = true;
                 isRecord = false;
                 isScoring = false;
                 Song = datas[0] + "_" + datas[1] + "_" + String.valueOf(type) + "_" +datas[3];
@@ -76,6 +70,14 @@ public class SongscreenActivity extends AppCompatActivity {
             case 9:
                 isScoring = false;
                 break;
+            case 8:
+                isScoring = false;
+                isRecord = false;
+                break;
+        }
+        if (!isPractice) {
+            itvView = (CanvasView)(findViewById(R.id.CanvasView));
+            translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
         }
 
         if (isRecord){
@@ -92,19 +94,22 @@ public class SongscreenActivity extends AppCompatActivity {
                 + "/" + SongPath + ".mp4");
         videoView.setVideoURI(video);
         videoView.requestFocus();
-        mediaController.setPadding(0, 0, 0, 80);
 
+        mediaController.setPadding(0, 0, 0, 80);
         videoView.start();
 
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
-                int score = audioController.stopAudioProcessor(true);
-                Song = Song + "_" + String.valueOf(score);
-                intent.putExtra("Score", Song);
-                startActivity(intent);
-                finish();
+                if (type == 8) finish();
+                else{
+                    Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
+                    int score = audioController.stopAudioProcessor(true);
+                    Song = Song + "_" + String.valueOf(score);
+                    intent.putExtra("Score", Song);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
     }
