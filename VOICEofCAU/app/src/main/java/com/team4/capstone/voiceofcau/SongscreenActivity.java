@@ -4,21 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -26,8 +21,6 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
-
-import java.util.TimerTask;
 
 public class SongscreenActivity extends AppCompatActivity {
     SharedPreferences prefs;
@@ -75,7 +68,13 @@ public class SongscreenActivity extends AppCompatActivity {
             case 2:
                 type = 5;
                 isRecord = false;
+                isScoring = false;
                 Song = datas[0] + "_" + datas[1] + "_" + String.valueOf(type) + "_" +datas[3];
+                break;
+            case 6:
+            case 7:
+            case 9:
+                isScoring = false;
                 break;
         }
 

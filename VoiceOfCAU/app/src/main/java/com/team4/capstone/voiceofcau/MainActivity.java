@@ -30,8 +30,6 @@ import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.mobileconnectors.s3.transferutility.*;
-import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.io.File;
 
@@ -43,7 +41,6 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences prefs;
     DynamoDBMapper dynamoDBMapper;
     String UserID;
-    boolean isDownloadEnd = false;
 
     public static final int MY_RECORD_PERMISSION = 78;
     public static final int MY_SAVING_PERMISSION = 79;
@@ -295,7 +292,6 @@ public class MainActivity extends AppCompatActivity
                         if (!mp4Video.exists()){
                             Intent intent = new Intent(getApplicationContext(), PopupNoB.class);
                             intent.putExtra("SongName", intentData);
-                            Log.d("START",SongName);
                             startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);
                         }
                         else if (SongType != 6  && SongType != 7) {
@@ -309,7 +305,6 @@ public class MainActivity extends AppCompatActivity
                             File tmp = new File(wavFile);
                             if (!tmp.exists()) {
                                 Intent intent = new Intent(getApplicationContext(), PopupNoB.class);
-                                Log.d("START","DOWNLOAD M4a ACTIVITY");
                                 String tmpData = intentDatas[0] + "_" + SongName + "_9_" + intentDatas[3];
                                 intent.putExtra("SongName", tmpData);
                                 startActivityForResult(intent, SUCCESS_FROM_PROGRESSBAR);

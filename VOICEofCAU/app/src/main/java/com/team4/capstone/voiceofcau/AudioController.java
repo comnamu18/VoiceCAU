@@ -79,7 +79,7 @@ public class    AudioController{
             return;
         }
         int audioBufferSize = 2048;
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA).format(new Date());
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.KOREA).format(new Date());
         //Setting Files
         finalFile = Environment.getExternalStorageDirectory()+"/"+ filePath + "_" + date + ".m4a";
         waveFile = new File(TMP_WAVE_FILE);

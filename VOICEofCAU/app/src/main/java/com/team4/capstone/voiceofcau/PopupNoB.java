@@ -96,7 +96,6 @@ public class PopupNoB extends Activity {
                 float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
                 int percentDone = (int)percentDonef;
                 Log.d("DOWNLOAD", "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
-
             }
             @Override
             public void onError(int id, Exception ex) {
