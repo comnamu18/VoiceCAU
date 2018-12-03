@@ -35,7 +35,6 @@ public class SongscreenActivity extends AppCompatActivity {
     boolean isScoring;
     boolean isPractice = false;
     CanvasView itvView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,7 +203,7 @@ class CanvasView extends View {
         try{
             Paint paint = new Paint();
             c.drawColor(Color.BLACK);
-            Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() , 520, Bitmap.Config.ARGB_8888);
+            Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() * 30, 520, Bitmap.Config.ARGB_8888);
             Canvas cv = new Canvas(bm);
             paint.setColor(Color.GRAY);
 
@@ -333,8 +332,8 @@ class CanvasView extends View {
                 iheight *= 4;
                 singer.singerEndTime.set(i, singer.singerEndTime.get(i));
                 singer.singerStartTime.set(i, singer.singerStartTime.get(i));
-                icurpos = singer.singerStartTime.get(i).intValue();
-                iwidth = singer.singerEndTime.get(i).intValue() - singer.singerStartTime.get(i).intValue();
+                icurpos = singer.singerStartTime.get(i).intValue() * 30;
+                iwidth = singer.singerEndTime.get(i).intValue() * 30 - singer.singerStartTime.get(i).intValue() * 30;
 
                 cv.drawRect(icurpos, iheight + 16, icurpos + iwidth, iheight, paint);
             }
