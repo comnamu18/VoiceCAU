@@ -87,8 +87,14 @@ public class SongscreenActivity extends AppCompatActivity {
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
 
-        audioController = new AudioController(
-                getApplicationContext(), SongPath, SongName, isRecord, isScoring, isDuet);
+        if (type != 8 ) {
+            audioController = new AudioController(
+                    getApplicationContext(), SongPath, SongName, isRecord, isScoring, isDuet);
+        }
+        else {
+            audioController = new AudioController(
+                    getApplicationContext(), SongPath, SongName, false, false, isDuet);
+        }
 
         videoView = (VideoView) findViewById(R.id.videoView);
         Uri video = Uri.parse(Environment.getExternalStorageDirectory().toString()
@@ -103,7 +109,10 @@ public class SongscreenActivity extends AppCompatActivity {
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                if (type == 8) finish();
+                if (type == 8) {
+                    audioController.stopAudioProcessor(false);
+                    finish();
+                }
                 else{
                     Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
                     int score = audioController.stopAudioProcessor(true);

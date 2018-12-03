@@ -97,14 +97,14 @@ public class    AudioController{
 
         StringTokenizer myTokens;
         try {
-            String scoreCSV = new String();
+            String scoreCSV = "scroe.csv";
             if (isDuet) {
-                scoreCSV = filePath.substring(0,filePath.length() - 3) + "score.csv";
+                scoreCSV = filePath.substring(0,filePath.length() - 3) + scoreCSV;
             }
             else {
-                scoreCSV = filePath + "score.csv";
+                scoreCSV = filePath + scoreCSV;
             }
-            Log.d("TESTFILE", scoreCSV);
+            Log.d("TESTFILE", context.getAssets().open(scoreCSV).toString());
             InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
             BufferedReader reader = new BufferedReader(is);
             String str2;
