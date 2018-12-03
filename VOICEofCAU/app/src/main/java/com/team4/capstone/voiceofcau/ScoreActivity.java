@@ -80,7 +80,7 @@ public class ScoreActivity extends AppCompatActivity {
                 else{
                     TestOverLay muxing = new TestOverLay();
                     try{
-                        muxing.mixSound("test.wav", SongPath + ".wav", "muxed.wav");
+                        muxing.mixSound( "test.wav",SongPath + ".wav", "muxed.wav");
                         muxing.runM4AConverter("/storage/emulated/0/muxed.wav", "/storage/emulated/0/muxed.m4a");
                         muxing.mux(SongPath + ".mp4", "muxed.m4a", "muxedOutput.mp4");
                     }

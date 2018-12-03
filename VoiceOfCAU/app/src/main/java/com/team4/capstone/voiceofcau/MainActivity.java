@@ -136,6 +136,11 @@ public class MainActivity extends AppCompatActivity
         song10[1] = "에일리";
         song10[2] = "snow";
 
+        String[] song11 = new String[3];
+        song11[0] = "징글벨";
+        song11[1] = "데모곡";
+        song11[2] = "demo";
+
         Resources res = getResources();
 
         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song1));
@@ -148,6 +153,7 @@ public class MainActivity extends AppCompatActivity
         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song8));
         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song9));
         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song10));
+        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.play_button),song11));
 
         //리스트 뷰에 어댑터를 셋팅 함
         listView.setAdapter(adapter);

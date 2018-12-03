@@ -59,6 +59,7 @@ public class    AudioController{
     private int mAudioLen = 0;
     boolean isScoring;
     boolean isRecord;
+    boolean isDuet;
     String SongName;
     String filePath;
     Context context;
@@ -70,7 +71,8 @@ public class    AudioController{
     File tempFile;
     String finalFile;
 
-    public AudioController(Context context, final String filePath, final String SongName, boolean isRecord, boolean isScoring){
+    public AudioController(Context context, final String filePath, final String SongName,
+                           boolean isRecord, boolean isScoring, boolean isDuet){
         this.SongName = SongName;
         this.isScoring = isScoring;
         this.isRecord = isRecord;
@@ -89,13 +91,20 @@ public class    AudioController{
         try {
             mBOStream = new BufferedOutputStream(new FileOutputStream(tempFile));
         } catch (FileNotFoundException e1) {
-            Log.d("testing", "mBOS CreateFail");
+            Log.d("testing", "bak CreateFail");
             e1.printStackTrace();
         }
 
         StringTokenizer myTokens;
         try {
-            String scoreCSV = filePath + "score.csv";
+            String scoreCSV = new String();
+            if (isDuet) {
+                scoreCSV = filePath.substring(0,filePath.length() - 3) + "score.csv";
+            }
+            else {
+                scoreCSV = filePath + "score.csv";
+            }
+            Log.d("TESTFILE", scoreCSV);
             InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
             BufferedReader reader = new BufferedReader(is);
             String str2;
@@ -130,25 +139,14 @@ public class    AudioController{
         }
     }
     private byte[] getFileHeader() {
-        byte[] header = new byte[HEADER_SIZE];
+        byte[] header = new byte[78];
         int totalDataLen = mAudioLen + 40;
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * 1/8;
-        header[0] = 'R';  // RIFF/WAVE header
-        header[1] = 'I';
-        header[2] = 'F';
-        header[3] = 'F';
-        header[4] = (byte) (totalDataLen & 0xff);
-        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
-        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
-        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
-        header[8] = 'W';
-        header[9] = 'A';
-        header[10] = 'V';
-        header[11] = 'E';
-        header[12] = 'f';  // 'fmt ' chunk
-        header[13] = 'm';
-        header[14] = 't';
-        header[15] = ' ';
+        header[0] = 'R'; header[1] = 'I'; header[2] = 'F'; header[3] = 'F';// RIFF/WAVE header
+        header[4] = (byte) (totalDataLen & 0xff); header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+        header[6] = (byte) ((totalDataLen >> 16) & 0xff); header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+        header[8] = 'W'; header[9] = 'A'; header[10] = 'V'; header[11] = 'E';
+        header[12] = 'f'; header[13] = 'm'; header[14] = 't'; header[15] = ' '; // 'fmt ' chunk
         header[16] = 16;  // 4 bytes: size of 'fmt ' chunk
         header[17] = 0;
         header[18] = 0;
@@ -157,30 +155,28 @@ public class    AudioController{
         header[21] = 0;
         header[22] = 1;
         header[23] = 0;
-        header[24] = (byte) (RECORDER_SAMPLERATE & 0xff);
-        header[25] = (byte) ((RECORDER_SAMPLERATE >> 8) & 0xff);
-        header[26] = (byte) ((RECORDER_SAMPLERATE >> 16) & 0xff);
-        header[27] = (byte) ((RECORDER_SAMPLERATE >> 24) & 0xff);
-        header[28] = (byte) (byteRate & 0xff);
-        header[29] = (byte) ((byteRate >> 8) & 0xff);
-        header[30] = (byte) ((byteRate >> 16) & 0xff);
-        header[31] = (byte) ((byteRate >> 24) & 0xff);
+        header[24] = (byte) (RECORDER_SAMPLERATE & 0xff); header[25] = (byte) ((RECORDER_SAMPLERATE >> 8) & 0xff);
+        header[26] = (byte) ((RECORDER_SAMPLERATE >> 16) & 0xff); header[27] = (byte) ((RECORDER_SAMPLERATE >> 24) & 0xff);
+        header[28] = (byte) (byteRate & 0xff); header[29] = (byte) ((byteRate >> 8) & 0xff);
+        header[30] = (byte) ((byteRate >> 16) & 0xff); header[31] = (byte) ((byteRate >> 24) & 0xff);
         header[32] = (byte) RECORDER_BPP /8;  // block align
         header[33] = 0;
         header[34] = RECORDER_BPP;// bits per sample
         header[35] = 0;
-        header[36] = 'd';
-        header[37] = 'a';
-        header[38] = 't';
-        header[39] = 'a';
-        header[40] = (byte)(mAudioLen & 0xff);
-        header[41] = (byte)((mAudioLen >> 8) & 0xff);
-        header[42] = (byte)((mAudioLen >> 16) & 0xff);
-        header[43] = (byte)((mAudioLen >> 24) & 0xff);
+        header[36] = 'd'; header[37] = 'a'; header[38] = 't'; header[39] = 'a';
+        header[40] = (byte)(mAudioLen & 0xff); header[41] = (byte)((mAudioLen >> 8) & 0xff);
+        header[42] = (byte)((mAudioLen >> 16) & 0xff); header[43] = (byte)((mAudioLen >> 24) & 0xff);
         return header;
     }
 
     public int stopAudioProcessor(boolean isSuccess){
+        if(isScoring || isRecord){
+            dispatcher.stop();
+            dispatcher.removeAudioProcessor(audioProcessor);
+            scoreThread.interrupt();
+            scoreThread = null;
+            Log.d("THREAD", "END");
+        }
         if(!isSuccess){
             try{
                 mBOStream.flush();
@@ -191,7 +187,9 @@ public class    AudioController{
             catch (Exception e){
                 e.printStackTrace();
             }
+            Log.d("TESTING", "CANCELED");
         }
+
         if (isRecord && isSuccess) {
             // Saving as File
             try{
@@ -208,21 +206,16 @@ public class    AudioController{
                 mBOStream.flush();
                 mBIStream.close();
                 mBOStream.close();
-
+                Log.d("WRITE DATAS", "COMPLETE");
                 TestOverLay test = new TestOverLay();
                 test.runM4AConverter(TMP_FILE + ".wav", finalFile);
-
+                Log.d("MUXING", "COMPLETE");
             }catch (Exception e) {
                 Log.d("testing", "mBOS CreateFail");
+                e.printStackTrace();
             }
         }
-        if(isScoring || isRecord){
-            dispatcher.stop();
-            dispatcher.removeAudioProcessor(audioProcessor);
-            scoreThread.interrupt();
-            scoreThread = null;
-            return getScore();
-        }
+
         CalculateScore.Time.clear();
         CalculateScore.Interval.clear();
         singer.singerEndTime.clear();
@@ -230,7 +223,7 @@ public class    AudioController{
         singer.singerStartTime.clear();
         singer.singtitle.clear();
 
-        return -1;
+        return getScore();
     }
     public int getScore() {
         if(!isScoring){
@@ -314,7 +307,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
             try{
                 mBOStream.write(data, 0, BUFFER_SIZE);
             } catch (Exception e){
-                Log.d("testing", "mBOS Write Fail");
+                e.printStackTrace();
             }
         }
         if(isScoring){

@@ -28,6 +28,11 @@ import java.io.OutputStream;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 //https://github.com/tqnst/MP4ParserMergeAudioVideo/blob/master/Mp4ParserSample-master/src/jp/classmethod/sample/mp4parser/MainActivity.java
 //https://stackoverflow.com/questions/8526552/encode-wav-to-aac-on-android
@@ -170,7 +175,11 @@ public class TestOverLay {
         }
 
         Track audioTrack = audio.getTracks().get(0);
-        video.addTrack(audioTrack);
+        Track videoTrack = video.getTrackByTrackId(1);
+        ArrayList<Track> tracks = new ArrayList<>();
+        tracks.add(audioTrack);
+        tracks.add(videoTrack);
+        video.setTracks(tracks);
 
         Container out = new DefaultMp4Builder().build(video);
 
@@ -261,10 +270,10 @@ public class TestOverLay {
         Log.d("mixing", "in2");
         BufferedOutputStream mBOStream = new BufferedOutputStream(new FileOutputStream(output));
         int step = 0;
-        in2.skip(44);
+        in2.skip(78);
         while((read1 = in1.read(buffer1)) != -1){
             read2 = in2.read(buffer2);
-            if ((read2 != -1) && (step > 43) ) {
+            if ((read2 != -1) && (step > 77) ) {
                 byte[] writeBuffer = new byte[BUFFER_SIZE];
                 for ( int i = 0 ; i < BUFFER_SIZE; i++) {
                     writeBuffer[i] = (byte)((byte)buffer1[i] + (byte)buffer2[i]);

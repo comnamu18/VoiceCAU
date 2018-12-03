@@ -22,6 +22,7 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+
 public class SongscreenActivity extends AppCompatActivity {
     SharedPreferences prefs;
     String Song;
@@ -52,7 +53,7 @@ public class SongscreenActivity extends AppCompatActivity {
 
         TextView textView=(TextView)findViewById(R.id.song_name);
         textView.setText(SongName);
-
+        boolean isDuet = false;
         switch(type) {
             case 1:
                 type = 4;
@@ -68,6 +69,7 @@ public class SongscreenActivity extends AppCompatActivity {
             case 6:
             case 7:
             case 9:
+                isDuet = true;
                 isScoring = false;
                 break;
             case 8:
@@ -84,17 +86,17 @@ public class SongscreenActivity extends AppCompatActivity {
             Button recordButton = (Button) findViewById(R.id.button2);
             recordButton.setBackground(ContextCompat.getDrawable(this, R.drawable.recordonbutton));
         }
+
         audioController = new AudioController(
-                getApplicationContext(), SongPath, SongName, isRecord, isScoring);
+                getApplicationContext(), SongPath, SongName, isRecord, isScoring, isDuet);
 
         videoView = (VideoView) findViewById(R.id.videoView);
-        mediaController = new MediaController(this);
-        mediaController.setAnchorView(videoView);
         Uri video = Uri.parse(Environment.getExternalStorageDirectory().toString()
                 + "/" + SongPath + ".mp4");
         videoView.setVideoURI(video);
         videoView.requestFocus();
-
+        mediaController = new MediaController(this);
+        mediaController.setAnchorView(videoView);
         mediaController.setPadding(0, 0, 0, 80);
         videoView.start();
 

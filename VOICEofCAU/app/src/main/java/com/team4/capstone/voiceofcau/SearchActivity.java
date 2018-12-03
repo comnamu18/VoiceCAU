@@ -37,6 +37,7 @@ public class SearchActivity extends AppCompatActivity {
         adapter.addItem(ContextCompat.getDrawable(this, R.drawable.play_button),"좋니","윤종신", "good");
         adapter.addItem(ContextCompat.getDrawable(this, R.drawable.play_button),"지나오다","닐로", "passby");
         adapter.addItem(ContextCompat.getDrawable(this, R.drawable.play_button),"첫눈처럼 너에게 가겠다","에일리", "snow");
+        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.play_button),"징글벨","데모곡", "demo");
 
         EditText editTextFilter = (EditText)findViewById(R.id.editTextFilter) ;
         editTextFilter.addTextChangedListener(new TextWatcher() {
