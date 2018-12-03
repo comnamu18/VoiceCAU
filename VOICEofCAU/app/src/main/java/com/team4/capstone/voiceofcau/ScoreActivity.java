@@ -54,7 +54,7 @@ public class ScoreActivity extends AppCompatActivity {
         type = Integer.valueOf(rawScore.split("_")[2]);
         UserID = rawScore.split("_")[3];
         score = Integer.valueOf(rawScore.split("_")[4]);
-        if(score != -1) {
+        if(type == 4) {
             createScoreStat();
             String scoreStr = score + "점!";
             textView.setText(scoreStr);
@@ -76,6 +76,21 @@ public class ScoreActivity extends AppCompatActivity {
                 if (type == 5) {
                     Toast.makeText(getApplicationContext(), "연습모드는 다시 듣기를 지원하지 않습니다.",
                             Toast.LENGTH_LONG).show();
+                }
+                else if (type == 4) {
+                    TestOverLay muxing = new TestOverLay();
+                    try{
+                        muxing.runM4AConverter("/storage/emulated/0/test.wav", "/storage/emulated/0/muxed.m4a");
+                        muxing.mux(SongPath + ".mp4", "muxed.m4a", "muxedOutput.mp4");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    String intentData = SongName + "_" + "muxedOutput_8_" + rawScore.split("_")[3];
+                    Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
+                    intent.putExtra("Songname", intentData);
+                    startActivity(intent);
+                    finish();
                 }
                 else{
                     TestOverLay muxing = new TestOverLay();
@@ -100,7 +115,7 @@ public class ScoreActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(getApplicationContext(), SongscreenActivity.class);
-                String reTry = rawScore.split("_")[0] + "_" + rawScore.split("_")[1]
+                String reTry = rawScore.split("_")[0] + "_" + rawScore.split("_")[1] + "_"
                         + rawScore.split("_")[2] + "_" + rawScore.split("_")[3];
                 intent.putExtra("Songname", reTry);
                 startActivity(intent);

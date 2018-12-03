@@ -139,7 +139,7 @@ public class    AudioController{
         }
     }
     private byte[] getFileHeader() {
-        byte[] header = new byte[78];
+        byte[] header = new byte[44];
         int totalDataLen = mAudioLen + 40;
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * 1/8;
         header[0] = 'R'; header[1] = 'I'; header[2] = 'F'; header[3] = 'F';// RIFF/WAVE header
@@ -177,18 +177,6 @@ public class    AudioController{
             scoreThread = null;
             Log.d("THREAD", "END");
         }
-        if(!isSuccess){
-            try{
-                mBOStream.flush();
-                mBOStream.close();
-                if(waveFile.exists()) waveFile.delete();
-                if(tempFile.exists()) tempFile.delete();
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-            Log.d("TESTING", "CANCELED");
-        }
 
         if (isRecord && isSuccess) {
             // Saving as File
@@ -216,13 +204,19 @@ public class    AudioController{
             }
         }
 
-        CalculateScore.Time.clear();
-        CalculateScore.Interval.clear();
-        singer.singerEndTime.clear();
-        singer.singerInterval.clear();
-        singer.singerStartTime.clear();
-        singer.singtitle.clear();
-
+        if(!isSuccess){
+            try{
+                mBOStream.flush();
+                mBOStream.close();
+                if(waveFile.exists()) waveFile.delete();
+                if(tempFile.exists()) tempFile.delete();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            Log.d("TESTING", "CANCELED");
+            return -1;
+        }
         return getScore();
     }
     public int getScore() {
@@ -231,6 +225,7 @@ public class    AudioController{
         }
         double score = 0;
         double totalTime = 0;
+        Log.d("Start Scoring", "START");
 
         //calculate Total time on the scorecard
         for(int i = 0; i < singer.singerStartTime.size(); i++)
@@ -267,7 +262,6 @@ public class    AudioController{
                 }
             }
             //입력시간이 채점표시간을 뛰어넘었을 때
-
             else if(CalculateScore.Time.get(i) > singer.singerEndTime.get(j)) {
                 String message = String.format("case 3 Score = %f : Time X (over), %d, %d", score, i, j);
                 Log.d("test3", message);
@@ -314,6 +308,7 @@ class  MyPitchDetector implements PitchDetectionHandler{
             if(pitch != -1 && pitch < 8000){
                 double timeStamp = audioEvent.getTimeStamp();
                 int intvNum = getintvNum(pitch);
+                Log.d("PICTH", "TIME : " + timeStamp + "intv : " + intvNum);
                 CalculateScore.Time.add(timeStamp);
                 CalculateScore.Interval.add(intvNum);
             }

@@ -69,8 +69,8 @@ public class SongscreenActivity extends AppCompatActivity {
             case 6:
             case 7:
             case 9:
-                isDuet = true;
                 isScoring = false;
+                isDuet = true;
                 break;
             case 8:
                 isScoring = false;
@@ -116,6 +116,13 @@ public class SongscreenActivity extends AppCompatActivity {
                 else{
                     Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
                     int score = audioController.stopAudioProcessor(true);
+                    CalculateScore.Time.clear();
+                    CalculateScore.Interval.clear();
+                    singer.singerEndTime.clear();
+                    singer.singerInterval.clear();
+                    singer.singerStartTime.clear();
+                    singer.singtitle.clear();
+                    audioController = null;
                     Song = Song + "_" + String.valueOf(score);
                     intent.putExtra("Score", Song);
                     startActivity(intent);
@@ -197,7 +204,7 @@ class CanvasView extends View {
         try{
             Paint paint = new Paint();
             c.drawColor(Color.BLACK);
-            Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() * 31, 520, Bitmap.Config.ARGB_8888);
+            Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() , 520, Bitmap.Config.ARGB_8888);
             Canvas cv = new Canvas(bm);
             paint.setColor(Color.GRAY);
 
@@ -324,8 +331,8 @@ class CanvasView extends View {
 //                iheight = 10;
 //            }
                 iheight *= 4;
-                singer.singerEndTime.set(i, singer.singerEndTime.get(i) * 31);
-                singer.singerStartTime.set(i, singer.singerStartTime.get(i) * 31);
+                singer.singerEndTime.set(i, singer.singerEndTime.get(i));
+                singer.singerStartTime.set(i, singer.singerStartTime.get(i));
                 icurpos = singer.singerStartTime.get(i).intValue();
                 iwidth = singer.singerEndTime.get(i).intValue() - singer.singerStartTime.get(i).intValue();
 
