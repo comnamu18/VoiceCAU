@@ -105,16 +105,24 @@ public class    AudioController{
                 scoreCSV =filePath + scoreCSV;
             }
             Log.d("TESTFILE", context.getAssets().open(scoreCSV).toString());
+            Log.d("SongName", scoreCSV);
             InputStreamReader is = new InputStreamReader(context.getAssets().open(scoreCSV));
             BufferedReader reader = new BufferedReader(is);
             String str2;
             while ((str2 = reader.readLine()) != null) {
                 myTokens = new StringTokenizer(str2, ",");
+
                 singer.singtitle.add(myTokens.nextToken());
                 singer.singerStartTime.add(Double.parseDouble(myTokens.nextToken()));
                 singer.singerEndTime.add(Double.parseDouble(myTokens.nextToken()));
                 singer.singerInterval.add(Integer.parseInt(myTokens.nextToken()));
+
             }
+            Log.d("SongInterval", singer.singerInterval.get(0).toString());
+
+            Log.d("SongInterval", singer.singerInterval.get(1).toString());
+
+            Log.d("SongInterval", singer.singerInterval.get(2).toString());
             reader.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -421,3 +429,5 @@ class singer {
     public static ArrayList<Double> singerEndTime = new ArrayList<>();
     public static ArrayList<Integer> singerInterval = new ArrayList<>();
 }
+
+

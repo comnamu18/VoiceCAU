@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -21,6 +22,10 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import java.util.ArrayList;
+
+import static com.team4.capstone.voiceofcau.SongscreenActivity.checkduet;
 
 
 public class SongscreenActivity extends AppCompatActivity {
@@ -34,6 +39,7 @@ public class SongscreenActivity extends AppCompatActivity {
     boolean isRecord;
     boolean isScoring;
     boolean isPractice = false;
+    static int checkduet = 0;
     CanvasView itvView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +84,7 @@ public class SongscreenActivity extends AppCompatActivity {
         }
         if (!isPractice) {
             itvView = (CanvasView)(findViewById(R.id.CanvasView));
-            translateAnim(0, -1, 0, 0, 257 * 1000, itvView);
+            translateAnim(0, -1, 0, 0, 50 * 1000, itvView);
         }
 
         if (isRecord){
@@ -109,18 +115,24 @@ public class SongscreenActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (type == 8) {
-                    audioController.stopAudioProcessor(false);
+                   setContentView(R.layout.activity_song_screen);
+                   audioController.stopAudioProcessor(false);
+                   checkduet = 1;
+//                    singer.singerEndTime.clear();
+//                    singer.singerInterval.clear();
+//                    singer.singerStartTime.clear();
+//                    singer.singtitle.clear();
                     finish();
                 }
                 else{
                     Intent intent = new Intent(getApplicationContext(), ScoreActivity.class);
                     int score = audioController.stopAudioProcessor(true);
-                    CalculateScore.Time.clear();
-                    CalculateScore.Interval.clear();
-                    singer.singerEndTime.clear();
-                    singer.singerInterval.clear();
-                    singer.singerStartTime.clear();
-                    singer.singtitle.clear();
+//                    CalculateScore.Time.clear();
+//                    CalculateScore.Interval.clear();
+//                    singer.singerEndTime.clear();
+//                    singer.singerInterval.clear();
+//                    singer.singerStartTime.clear();
+//                    singer.singtitle.clear();
                     audioController = null;
                     Song = Song + "_" + String.valueOf(score);
                     intent.putExtra("Score", Song);
@@ -166,7 +178,7 @@ public class SongscreenActivity extends AppCompatActivity {
     public static void translateAnim(float xStart, float xEnd, float yStart, float yEnd, int duration, CanvasView view) {
         TranslateAnimation translateAnimation = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF,xStart,
-                Animation.RELATIVE_TO_SELF, xEnd,
+                Animation.RELATIVE_TO_SELF,xEnd,
                 Animation.RELATIVE_TO_SELF,yStart,
                 Animation.RELATIVE_TO_SELF,yEnd);
         translateAnimation.setDuration(duration);
@@ -202,144 +214,196 @@ class CanvasView extends View {
     public void onDraw(Canvas c) {
         try{
             Paint paint = new Paint();
+            Paint detailpaint = new Paint();
             c.drawColor(Color.BLACK);
-            Bitmap bm = Bitmap.createBitmap(singer.singerEndTime.get(singer.singerEndTime.size() - 1).intValue() * 30, 520, Bitmap.Config.ARGB_8888);
+            detailpaint.setColor(Color.YELLOW);
+            Log.d("checkbitmap",singer.singerEndTime.get(singer.singerEndTime.size() - 1).toString() );
+            Bitmap bm = Bitmap.createBitmap((int)(singer.singerEndTime.get(singer.singerEndTime.size() - 1)* 100), 520, Bitmap.Config.ARGB_8888);
             Canvas cv = new Canvas(bm);
             paint.setColor(Color.GRAY);
 
-            //cv.drawRect(10, 10, 40, 40, paint);
-            for (int i = 0; i < singer.singerEndTime.size(); i++) {
-                if (i != singer.singerInterval.size() - 1) {
-                    nextintv = singer.singerInterval.get(i + 1);
-                    intv = singer.singerInterval.get(i);
+                //cv.drawRect(10, 10, 40, 40, paint);
+                for (int i = 0; i < singer.singerEndTime.size(); i++) {
+                    if (i != singer.singerInterval.size() - 1) {
+                        nextintv = singer.singerInterval.get(i + 1);
+                        intv = singer.singerInterval.get(i);
+                    }
+
+                    if (singer.singerInterval.get(i) == 1) {
+                        iheight = 72;
+                    } else if (singer.singerInterval.get(i) == 2) {
+                        iheight = 70;
+                    } else if (singer.singerInterval.get(i) == 3) {
+                        iheight = 68;
+                    } else if (singer.singerInterval.get(i) == 4) {
+                        iheight = 66;
+                    } else if (singer.singerInterval.get(i) == 5) {
+                        iheight = 64;
+                    } else if (singer.singerInterval.get(i) == 6) {
+                        iheight = 62;
+                    } else if (singer.singerInterval.get(i) == 7) {
+                        iheight = 58;
+                    } else if (singer.singerInterval.get(i) == 8) {
+                        iheight = 56;
+                    } else if (singer.singerInterval.get(i) == 9) {
+                        iheight = 54;
+                    } else if (singer.singerInterval.get(i) == 10) {
+                        iheight = 52;
+                    } else if (singer.singerInterval.get(i) == 11) {
+                        iheight = 50;
+                    } else if (singer.singerInterval.get(i) == 12) {
+                        iheight = 48;
+                    } else if (singer.singerInterval.get(i) == 13) {
+                        iheight = 46;
+                    } else if (singer.singerInterval.get(i) == 14) {
+                        iheight = 42;
+                    } else if (singer.singerInterval.get(i) == 15) {
+                        iheight = 40;
+                    } else if (singer.singerInterval.get(i) == 16) {
+                        iheight = 38;
+                    } else if (singer.singerInterval.get(i) == 17) {
+                        iheight = 36;
+                    } else if (singer.singerInterval.get(i) == 18) {
+                        iheight = 32;
+                    } else if (singer.singerInterval.get(i) == 19) {
+                        iheight = 30;
+                    } else if (singer.singerInterval.get(i) == 20) {
+                        iheight = 28;
+                    } else if (singer.singerInterval.get(i) == 21) {
+                        iheight = 26;
+                    } else if (singer.singerInterval.get(i) == 22) {
+                        iheight = 24;
+                    } else if (singer.singerInterval.get(i) == 23) {
+                        iheight = 22;
+                    } else if (singer.singerInterval.get(i) == 24) {
+                        iheight = 20;
+                    } else if (singer.singerInterval.get(i) == 25) {
+                        iheight = 16;
+                    } else if (singer.singerInterval.get(i) == 26) {
+                        iheight = 14;
+                    } else if (singer.singerInterval.get(i) == 27) {
+                        iheight = 12;
+                    } else if (singer.singerInterval.get(i) == 28) {
+                        iheight = 10;
+                    }
+
+                    iheight *= 4;
+                    icurpos = (int) (singer.singerStartTime.get(i) * 100);
+                    iwidth = (int) (singer.singerEndTime.get(i) * 100 - singer.singerStartTime.get(i) * 100);
+                    Log.d("testintervalbar", singer.singerInterval.get(i).toString());
+                    Log.d("testTimebar", singer.singerStartTime.get(i).toString());
+                    cv.drawRect(icurpos, iheight + 16, icurpos + iwidth, iheight, paint);
+                }
+            if(checkduet == 1)
+            {
+                Log.d("detail mode start", "start");
+                ArrayList<Double> startTime = new ArrayList<>();
+                ArrayList<Double> endTime = new ArrayList<>();
+                ArrayList<Integer> realInterval = new ArrayList<>();
+                int tried = 0;
+                int j = 0;
+
+                Log.d("CalculateScore Interval 1st", CalculateScore.Interval.get(0).toString());
+                for(int i = 0; i < CalculateScore.Interval.size(); i++) {
+                    if (tried == 0) {
+                        Log.d("CalculateScore Interval 2nd", CalculateScore.Interval.get(0).toString());
+                        startTime.add(CalculateScore.Time.get(i));
+                        endTime.add(CalculateScore.Time.get(i));
+                        realInterval.add(CalculateScore.Interval.get(i));
+                        tried++;
+                    } else if ((realInterval.get(j) - CalculateScore.Interval.get(i)) == 0 && CalculateScore.Time.get(i) - endTime.get(j) < 0.2) {
+                        endTime.set(j, CalculateScore.Time.get(i));
+                    } else if (CalculateScore.Time.get(i) - endTime.get(j) < 0.2 &&
+                            realInterval.get(j) != CalculateScore.Interval.get(i)) {
+                        endTime.set(j, CalculateScore.Time.get(i));
+                        startTime.add(CalculateScore.Time.get(i));
+                        endTime.add(CalculateScore.Time.get(i));
+                        realInterval.add(CalculateScore.Interval.get(i));
+                        j++;
+                    } else {
+                        endTime.add( CalculateScore.Time.get(i));
+                        startTime.add(CalculateScore.Time.get(i));
+                        endTime.add(CalculateScore.Time.get(i));
+                        realInterval.add(CalculateScore.Interval.get(i));
+                        j++;
+                    }
                 }
 
-                if (singer.singerInterval.get(i) == 1) {
-                    iheight = 72;
-                } else if (singer.singerInterval.get(i) == 2) {
-                    iheight = 70;
-                } else if (singer.singerInterval.get(i) == 3) {
-                    iheight = 68;
-                } else if (singer.singerInterval.get(i) == 4) {
-                    iheight = 66;
-                } else if (singer.singerInterval.get(i) == 5) {
-                    iheight = 64;
-                } else if (singer.singerInterval.get(i) == 6) {
-                    iheight = 62;
-                } else if (singer.singerInterval.get(i) == 7) {
-                    iheight = 58;
-                } else if (singer.singerInterval.get(i) == 8) {
-                    iheight = 56;
-                } else if (singer.singerInterval.get(i) == 9) {
-                    iheight = 54;
-                } else if (singer.singerInterval.get(i) == 10) {
-                    iheight = 52;
-                } else if (singer.singerInterval.get(i) == 11) {
-                    iheight = 50;
-                } else if (singer.singerInterval.get(i) == 12) {
-                    iheight = 48;
-                } else if (singer.singerInterval.get(i) == 13) {
-                    iheight = 46;
-                } else if (singer.singerInterval.get(i) == 14) {
-                    iheight = 42;
-                } else if (singer.singerInterval.get(i) == 15) {
-                    iheight = 40;
-                } else if (singer.singerInterval.get(i) == 16) {
-                    iheight = 38;
-                } else if (singer.singerInterval.get(i) == 17) {
-                    iheight = 36;
-                } else if (singer.singerInterval.get(i) == 18) {
-                    iheight = 32;
-                } else if (singer.singerInterval.get(i) == 19) {
-                    iheight = 30;
-                } else if (singer.singerInterval.get(i) == 20) {
-                    iheight = 28;
-                } else if (singer.singerInterval.get(i) == 21) {
-                    iheight = 26;
-                } else if (singer.singerInterval.get(i) == 22) {
-                    iheight = 24;
-                } else if (singer.singerInterval.get(i) == 23) {
-                    iheight = 22;
-                } else if (singer.singerInterval.get(i) == 24) {
-                    iheight = 20;
-                } else if (singer.singerInterval.get(i) == 25) {
-                    iheight = 16;
-                } else if (singer.singerInterval.get(i) == 26) {
-                    iheight = 14;
-                } else if (singer.singerInterval.get(i) == 27) {
-                    iheight = 12;
-                } else if (singer.singerInterval.get(i) == 28) {
-                    iheight = 10;
+                for (int i = 0; i < endTime.size(); i++) {
+                    if (realInterval.get(i) == 1) {
+                        iheight = 72;
+                    } else if (realInterval.get(i) == 2) {
+                        iheight = 70;
+                    } else if (realInterval.get(i) == 3) {
+                        iheight = 68;
+                    } else if (realInterval.get(i) == 4) {
+                        iheight = 66;
+                    } else if (realInterval.get(i) == 5) {
+                        iheight = 64;
+                    } else if (realInterval.get(i) == 6) {
+                        iheight = 62;
+                    } else if (realInterval.get(i) == 7) {
+                        iheight = 58;
+                    } else if (realInterval.get(i) == 8) {
+                        iheight = 56;
+                    } else if (realInterval.get(i) == 9) {
+                        iheight = 54;
+                    } else if (realInterval.get(i) == 10) {
+                        iheight = 52;
+                    } else if (realInterval.get(i) == 11) {
+                        iheight = 50;
+                    } else if (realInterval.get(i) == 12) {
+                        iheight = 48;
+                    } else if (realInterval.get(i) == 13) {
+                        iheight = 46;
+                    } else if (realInterval.get(i) == 14) {
+                        iheight = 42;
+                    } else if (realInterval.get(i) == 15) {
+                        iheight = 40;
+                    } else if (realInterval.get(i) == 16) {
+                        iheight = 38;
+                    } else if (realInterval.get(i) == 17) {
+                        iheight = 36;
+                    } else if (realInterval.get(i) == 18) {
+                        iheight = 32;
+                    } else if (realInterval.get(i) == 19) {
+                        iheight = 30;
+                    } else if (realInterval.get(i) == 20) {
+                        iheight = 28;
+                    } else if (realInterval.get(i) == 21) {
+                        iheight = 26;
+                    } else if (realInterval.get(i) == 22) {
+                        iheight = 24;
+                    } else if (realInterval.get(i) == 23) {
+                        iheight = 22;
+                    } else if (realInterval.get(i) == 24) {
+                        iheight = 20;
+                    } else if (realInterval.get(i) == 25) {
+                        iheight = 16;
+                    } else if (realInterval.get(i) == 26) {
+                        iheight = 14;
+                    } else if (realInterval.get(i) == 27) {
+                        iheight = 12;
+                    } else if (realInterval.get(i) == 28) {
+                        iheight = 10;
+                    }
+
+                    iheight *= 4;
+                    icurpos = (int) (startTime.get(i) * 100);
+                    iwidth = (int) (endTime.get(i) * 100 - startTime.get(i) * 100);
+                    Log.d("testDetailintervalbar", realInterval.get(i).toString());
+                    Log.d("testDetailTimebar", startTime.get(i).toString());
+                    cv.drawRect(icurpos, iheight + 16, icurpos + iwidth, iheight, detailpaint);
                 }
-
-//            if (singer.singerInterval.get(i) == 1) {
-//                iheight = 460;
-//            } else if (singer.singerInterval.get(i) == 2) {
-//                iheight = 445;
-//            } else if (singer.singerInterval.get(i) == 3) {
-//                iheight = 430;
-//            } else if (singer.singerInterval.get(i) == 4) {
-//                iheight = 415;
-//            } else if (singer.singerInterval.get(i) == 5) {
-//                iheight = 400;
-//            } else if (singer.singerInterval.get(i) == 6) {
-//                iheight = 370;
-//            } else if (singer.singerInterval.get(i) == 7) {
-//                iheight = 355;
-//            } else if (singer.singerInterval.get(i) == 8) {
-//                iheight = 340;
-//            } else if (singer.singerInterval.get(i) == 9) {
-//                iheight = 325;
-//            } else if (singer.singerInterval.get(i) == 10) {
-//                iheight = 310;
-//            } else if (singer.singerInterval.get(i) == 11) {
-//                iheight = 295;
-//            } else if (singer.singerInterval.get(i) == 12) {
-//                iheight = 280;
-//            } else if (singer.singerInterval.get(i) == 13) {
-//                iheight = 250;
-//            } else if (singer.singerInterval.get(i) == 14) {
-//                iheight = 235;
-//            } else if (singer.singerInterval.get(i) == 15) {
-//                iheight = 220;
-//            } else if (singer.singerInterval.get(i) == 16) {
-//                iheight = 205;
-//            } else if (singer.singerInterval.get(i) == 17) {
-//                iheight = 190;
-//            } else if (singer.singerInterval.get(i) == 18) {
-//                iheight = 160;
-//            } else if (singer.singerInterval.get(i) == 19) {
-//                iheight = 145;
-//            } else if (singer.singerInterval.get(i) == 20) {
-//                iheight = 130;
-//            } else if (singer.singerInterval.get(i) == 21) {
-//                iheight = 115;
-//            } else if (singer.singerInterval.get(i) == 22) {
-//                iheight = 100;
-//            } else if (singer.singerInterval.get(i) == 23) {
-//                iheight = 85;
-//            } else if (singer.singerInterval.get(i) == 24) {
-//                iheight = 70;
-//            } else if (singer.singerInterval.get(i) == 25) {
-//                iheight = 55;
-//            } else if (singer.singerInterval.get(i) == 26) {
-//                iheight = 40;
-//            } else if (singer.singerInterval.get(i) == 27) {
-//                iheight = 25;
-//            } else if (singer.singerInterval.get(i) == 28) {
-//                iheight = 10;
-//            }
-                iheight *= 4;
-                singer.singerEndTime.set(i, singer.singerEndTime.get(i));
-                singer.singerStartTime.set(i, singer.singerStartTime.get(i));
-                icurpos = singer.singerStartTime.get(i).intValue() * 30;
-                iwidth = singer.singerEndTime.get(i).intValue() * 30 - singer.singerStartTime.get(i).intValue() * 30;
-
-                cv.drawRect(icurpos, iheight + 16, icurpos + iwidth, iheight, paint);
-            }
 //        bm.setHeight(52);
 //        bm.setWidth(2000);
-            c.drawBitmap(bm, 10 + bx, 10, paint);
+
+            }
+
+//        bm.setHeight(52);
+//        bm.setWidth(2000);
+                c.drawBitmap(bm, 10, 10, paint);
+
         }catch (Exception e) {
             e.printStackTrace();
         }

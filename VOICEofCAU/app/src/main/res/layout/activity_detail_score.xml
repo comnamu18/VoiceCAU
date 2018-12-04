@@ -5,17 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     android:background="#000000"
-    tools:context=".Detail_scoreAcitivity">
-
-    <com.team4.capstone.voiceofcau.CanvasView2
-        android:id="@+id/CanvasView"
-        android:layout_width="7967px"
-        android:layout_height="126dp"
-        android:background="#FFFFFF"
-        tools:layout_editor_absoluteY="64dp">
 
 
 
-    </com.team4.capstone.voiceofcau.CanvasView2>
 
 </android.support.constraint.ConstraintLayout>
